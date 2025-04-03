@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Report</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; text-align: center; background: #f4f7f9; }
+        .container { max-width: 90%; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 2px solid #ddd; }
+        th, td { padding: 8px; text-align: center; border: 1px solid #ddd; font-size: 14px; }
+        th { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <h1>📜 Batch Report</h1>
+    <div class="container">
+        <h2 id="batchTitle"></h2>
+        <p><strong>Uploaded By:</strong> <span id="uploadedBy"></span> | <strong>Date:</strong> <span id="uploadDate"></span></p>
+        
+        <table id="report-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Learner Code</th>
+                    <th>Learner Name</th>
+                    <th>BS-CIT Classroom</th>
+                    <th>BS-CIT Lab</th>
+                    <th>BS-CIT Sessions</th>
+                    <th>BS-CIT Status</th>
+                    <th>Overall Status</th>
+                </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const batchName = sessionStorage.getItem("batchName");
+            const uploadedBy = sessionStorage.getItem("uploadedBy");
+            const reportData = JSON.parse(sessionStorage.getItem("reportData"));
+
+            if (!batchName || !uploadedBy || !reportData) {
+                alert("No report data found. Please upload a file first.");
+                window.location.href = "index.html";
+                return;
+            }
+
+            document.getElementById("batchTitle").textContent = `📌 Batch Name: ${batchName}`;
+            document.getElementById("uploadedBy").textContent = uploadedBy;
+            document.getElementById("uploadDate").textContent = new Date().toLocaleDateString();
+
+            const tableBody = document.getElementById("table-body");
+            reportData.forEach((learner, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${learner.code}</td>
+                    <td>${learner.name}</td>
+                    <td>${learner.courses["BS-CIT"].classroomMarks || "N/A"}</td>
+                    <td>${learner.courses["BS-CIT"].labMarks || "N/A"}</td>
+                    <td>${learner.courses["BS-CIT"].sessionCount || "N/A"}</td>
+                    <td>${learner.courses["BS-CIT"].eligible || "N/A"}</td>
+                    <td>${learner.eligible}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        });
+    </script>
+</body>
+</html>

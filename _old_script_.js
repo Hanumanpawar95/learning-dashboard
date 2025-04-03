@@ -45,13 +45,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 // Update the report header
-                // Store report data in sessionStorage and redirect
-sessionStorage.setItem("batchName", batchName);
-sessionStorage.setItem("uploadedBy", uploadedBy);
-sessionStorage.setItem("reportData", JSON.stringify(data));
+                reportHeader.style.display = "block";
+                batchTitle.textContent = `📌 Batch Name: ${batchName}`;
+                uploadedByText.textContent = uploadedBy;
+                uploadDateText.textContent = new Date().toLocaleDateString();
 
-window.location.href = "report.html";
-
+                displayResults(data);
+            })
             .catch((error) => {
                 console.error("❌ Upload Error:", error);
                 alert("❌ Failed to upload the file. Please try again.");
