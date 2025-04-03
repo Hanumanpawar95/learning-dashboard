@@ -3,11 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const fileInput = document.getElementById("csvFile");
     const batchNameInput = document.getElementById("batchName");
     const uploadedByInput = document.getElementById("uploadBy");
-    const reportHeader = document.getElementById("report-header");
-    const batchTitle = document.getElementById("batchTitle");
-    const uploadedByText = document.getElementById("uploadedBy");
-    const uploadDateText = document.getElementById("uploadDate");
     const tableBody = document.getElementById("table-body");
+    const tableHeaderRow = document.getElementById("table-header-row");
 
     if (!form) {
         console.error("❌ Error: #upload-form not found!");
@@ -24,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const batchName = batchNameInput.value.trim();
         const uploadedBy = uploadedByInput.value.trim();
-        
+
         if (!batchName || !uploadedBy) {
             alert("⚠️ Please enter Batch Name and Uploaded By.");
             return;
@@ -44,91 +41,85 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                // Update the report header
-                // Store report data in sessionStorage and redirect
-sessionStorage.setItem("batchName", batchName);
-sessionStorage.setItem("uploadedBy", uploadedBy);
-sessionStorage.setItem("reportData", JSON.stringify(data));
+                // Store data and redirect to report page
+                sessionStorage.setItem("batchName", batchName);
+                sessionStorage.setItem("uploadedBy", uploadedBy);
+                sessionStorage.setItem("reportData", JSON.stringify(data));
 
-window.location.href = "report.html";
-
+                window.location.href = "report.html";
+            })
             .catch((error) => {
                 console.error("❌ Upload Error:", error);
                 alert("❌ Failed to upload the file. Please try again.");
             });
     });
 
-    function displayResults(learners) {
-        tableBody.innerHTML = "";
+    function generateReport() {
+        const storedData = sessionStorage.getItem("reportData");
+        if (!storedData) {
+            console.error("⚠️ No report data found.");
+            return;
+        }
+
+        const learners = JSON.parse(storedData);
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        if (learners.length === 0) {
+            alert("⚠️ No data available to display.");
+            return;
+        }
+
+        const courseNames = Object.keys(learners[0].courses);
+        tableHeaderRow.innerHTML = `
+            <th>#</th>
+            <th>Learner Code</th>
+            <th>Learner Name</th>
+            ${courseNames
+                .map(
+                    (course) =>
+                        `<th>${course} Classroom</th><th>${course} Lab</th><th>${course} Sessions</th><th>${course} Status</th>`
+                )
+                .join("")}
+            <th>Overall Status</th>
+        `;
 
         learners.forEach((learner, index) => {
             const row = document.createElement("tr");
-
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td>${learner.code}</td>
                 <td>${learner.name}</td>
+            `;
 
-                ${createCourseCells(learner, "BS-CIT")}
-                ${createCourseCells(learner, "BS-CLS")}
-                ${createCourseCells(learner, "BS-CSS")}
+            let isEligibleForAnyCourse = false;
 
-                <td class="${getStatusClass(learner.eligible)}">${learner.eligible}</td>
+            courseNames.forEach((course) => {
+                const { classroomMarks, labMarks, sessionCount, eligible } = learner.courses[course];
+
+                row.innerHTML += `
+                    <td>${classroomMarks} / 20</td>
+                    <td>${labMarks} / 60</td>
+                    <td>${sessionCount} / 60</td>
+                    <td class="${eligible === '✅ Eligible' ? 'eligible badge' : 'not-eligible badge'}">${eligible}</td>
+                `;
+
+                if (eligible === "✅ Eligible") {
+                    isEligibleForAnyCourse = true;
+                }
+            });
+
+            row.innerHTML += `
+                <td class="${isEligibleForAnyCourse ? 'eligible badge' : 'not-eligible badge'}">
+                    ${isEligibleForAnyCourse ? "✅ Eligible for at least one course" : "❌ Not Eligible for any course"}
+                </td>
             `;
 
             tableBody.appendChild(row);
         });
     }
 
-    function createCourseCells(learner, course) {
-        if (!learner.courses[course]) {
-            return `<td colspan="4">N/A</td>`;
-        }
-
-        const { classroomMarks, labMarks, sessionCount, eligible } = learner.courses[course];
-
-        return `
-            <td>${classroomMarks}</td>
-            <td>${labMarks}</td>
-            <td>${sessionCount}</td>
-            <td class="${getStatusClass(eligible)}">${eligible}</td>
-        `;
+    // Ensure the report is generated after navigating to report.html
+    if (window.location.pathname.includes("report.html")) {
+        generateReport();
     }
-
-    function getStatusClass(status) {
-        return status === "✅ Eligible" ? "eligible badge" : "not-eligible badge";
-    }
-    // Print Report Function
-function printReport() {
-    const printWindow = window.open('', '', 'width=900,height=600');
-    printWindow.document.write('<html><head><title>Print Report</title></head><body>');
-    printWindow.document.write(document.querySelector(".container").innerHTML);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-}
-
-// Download CSV Function
-function downloadCSV() {
-    let csv = [];
-    let rows = document.querySelectorAll("#report-table tr");
-
-    for (let row of rows) {
-        let cols = row.querySelectorAll("th, td");
-        let rowData = [];
-        for (let col of cols) {
-            rowData.push(col.innerText);
-        }
-        csv.push(rowData.join(","));
-    }
-
-    let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "learner_report.csv");
-    document.body.appendChild(link);
-    link.click();
-}
-
 });
