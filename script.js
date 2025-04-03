@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const courseNames = Object.keys(learners[0].courses);
+        const courseNames = Object.keys(learners[0].courses || {}); // Fix: Handle undefined courses
         tableHeaderRow.innerHTML = `
             <th>#</th>
             <th>Learner Code</th>
@@ -94,7 +94,11 @@ document.addEventListener("DOMContentLoaded", function () {
             let isEligibleForAnyCourse = false;
 
             courseNames.forEach((course) => {
-                const { classroomMarks, labMarks, sessionCount, eligible } = learner.courses[course];
+                const courseData = learner.courses[course] || {}; // Fix: Avoid errors if course data is missing
+                const classroomMarks = courseData.classroomMarks || 0;
+                const labMarks = courseData.labMarks || 0;
+                const sessionCount = courseData.sessionCount || 0;
+                const eligible = courseData.eligible || "❌ Not Eligible";
 
                 row.innerHTML += `
                     <td>${classroomMarks} / 20</td>
