@@ -1,136 +1,125 @@
-
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("upload-form");
-  const fileInput = document.getElementById("csvFile");
-  const batchNameInput = document.getElementById("batchName");
-  const uploadedByInput = document.getElementById("uploadBy");
+    const form = document.getElementById("upload-form");
+    const fileInput = document.getElementById("csvFile");
+    const batchNameInput = document.getElementById("batchName");
+    const uploadedByInput = document.getElementById("uploadBy");
+    const tableBody = document.getElementById("table-body");
+    const tableHeaderRow = document.getElementById("table-header-row");
 
-  const tableBody = document.getElementById("table-body");
-  const tableHeaderRow = document.getElementById("table-header-row");
-  const reportSection = document.getElementById("report-section");
-  const batchTitle = document.getElementById("batchTitle");
-  const uploadedBySpan = document.getElementById("uploadedBy");
-  const uploadDate = document.getElementById("uploadDate");
-
-  // ✅ If report data already exists in sessionStorage, show it
-  if (sessionStorage.getItem("reportData")) {
-    const learners = JSON.parse(sessionStorage.getItem("reportData"));
-    const batchName = sessionStorage.getItem("batchName");
-    const uploadedBy = sessionStorage.getItem("uploadedBy");
-    showReport(learners, batchName, uploadedBy);
-  }
-
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    if (!fileInput.files.length) {
-      alert("❌ Please select a CSV file before uploading.");
-      return;
+    if (!form) {
+        console.error("❌ Error: #upload-form not found!");
+        return;
     }
 
-    const batchName = batchNameInput.value.trim();
-    const uploadedBy = uploadedByInput.value.trim();
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-    if (!batchName || !uploadedBy) {
-      alert("⚠️ Please enter Batch Name and Uploaded By.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-
-    fetch("http://localhost:5000/upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then(async (response) => {
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("❌ Server did not return JSON.");
+        if (!fileInput.files.length) {
+            alert("❌ Please select a CSV file before uploading.");
+            return;
         }
 
-        const data = await response.json();
-        console.log("✅ Response received from backend:", data);
+        const batchName = batchNameInput.value.trim();
+        const uploadedBy = uploadedByInput.value.trim();
 
-        if (!data || data.length === 0) {
-          alert("⚠️ No data found in the uploaded CSV.");
-          return;
+        if (!batchName || !uploadedBy) {
+            alert("⚠️ Please enter Batch Name and Uploaded By.");
+            return;
         }
 
-        // ✅ Save report data in sessionStorage
-        sessionStorage.setItem("batchName", batchName);
-        sessionStorage.setItem("uploadedBy", uploadedBy);
-        sessionStorage.setItem("reportData", JSON.stringify(data));
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
 
-        showReport(data, batchName, uploadedBy);
-      })
-      .catch((error) => {
-        console.error("❌ Upload Error:", error);
-        alert("❌ Failed to upload the file. Please try again.");
-      });
-  });
+        fetch("http://localhost:5000/upload", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data || data.length === 0) {
+                    alert("⚠️ No data found in the uploaded CSV.");
+                    return;
+                }
 
-  function showReport(learners, batchName, uploadedBy) {
-    reportSection.style.display = "block";
-    batchTitle.textContent = `📌 Batch: ${batchName}`;
-    uploadedBySpan.textContent = uploadedBy;
-    uploadDate.textContent = new Date().toLocaleDateString();
+                // Store data and redirect to report page
+                sessionStorage.setItem("batchName", batchName);
+                sessionStorage.setItem("uploadedBy", uploadedBy);
+                sessionStorage.setItem("reportData", JSON.stringify(data));
 
-    tableBody.innerHTML = "";
-
-    if (learners.length === 0) {
-      alert("⚠️ No data available to display.");
-      return;
-    }
-
-    const courseNames = Object.keys(learners[0].courses || {});
-    tableHeaderRow.innerHTML = `
-      <th>#</th>
-      <th>Learner Code</th>
-      <th>Learner Name</th>
-      ${courseNames
-        .map(
-          (course) =>
-            `<th>${course} Classroom</th><th>${course} Lab</th><th>${course} Sessions</th><th>${course} Status</th>`
-        )
-        .join("")}
-      <th>Overall Status</th>
-    `;
-
-    learners.forEach((learner, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${learner.code}</td>
-        <td>${learner.name}</td>
-      `;
-
-      let isEligible = false;
-
-      courseNames.forEach((course) => {
-        const data = learner.courses[course] || {};
-        const classroomMarks = data.classroomMarks || 0;
-        const labMarks = data.labMarks || 0;
-        const sessionCount = data.sessionCount || 0;
-        const eligible = data.eligible || "❌ Not Eligible";
-
-        if (eligible === "✅ Eligible") isEligible = true;
-
-        row.innerHTML += `
-          <td>${classroomMarks}</td>
-          <td>${labMarks}</td>
-          <td>${sessionCount}</td>
-          <td class="${eligible === '✅ Eligible' ? 'eligible badge' : 'not-eligible badge'}">${eligible}</td>
-        `;
-      });
-
-      row.innerHTML += `
-        <td class="${isEligible ? 'eligible badge' : 'not-eligible badge'}">
-          ${isEligible ? "✅ Eligible for at least one course" : "❌ Not Eligible for any course"}
-        </td>
-      `;
-
-      tableBody.appendChild(row);
+                window.location.href = "report.html";
+            })
+            .catch((error) => {
+                console.error("❌ Upload Error:", error);
+                alert("❌ Failed to upload the file. Please try again.");
+            });
     });
-  }
+
+    function generateReport() {
+        const storedData = sessionStorage.getItem("reportData");
+        if (!storedData) {
+            console.error("⚠️ No report data found.");
+            return;
+        }
+
+        const learners = JSON.parse(storedData);
+        tableBody.innerHTML = ""; // Clear existing rows
+
+        if (learners.length === 0) {
+            alert("⚠️ No data available to display.");
+            return;
+        }
+
+        const courseNames = Object.keys(learners[0].courses);
+        tableHeaderRow.innerHTML = `
+            <th>#</th>
+            <th>Learner Code</th>
+            <th>Learner Name</th>
+            ${courseNames
+                .map(
+                    (course) =>
+                        `<th>${course} Classroom</th><th>${course} Lab</th><th>${course} Sessions</th><th>${course} Status</th>`
+                )
+                .join("")}
+            <th>Overall Status</th>
+        `;
+
+        learners.forEach((learner, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${learner.code}</td>
+                <td>${learner.name}</td>
+            `;
+
+            let isEligibleForAnyCourse = false;
+
+            courseNames.forEach((course) => {
+                const { classroomMarks, labMarks, sessionCount, eligible } = learner.courses[course];
+
+                row.innerHTML += `
+                    <td>${classroomMarks} / 20</td>
+                    <td>${labMarks} / 60</td>
+                    <td>${sessionCount} / 60</td>
+                    <td class="${eligible === '✅ Eligible' ? 'eligible badge' : 'not-eligible badge'}">${eligible}</td>
+                `;
+
+                if (eligible === "✅ Eligible") {
+                    isEligibleForAnyCourse = true;
+                }
+            });
+
+            row.innerHTML += `
+                <td class="${isEligibleForAnyCourse ? 'eligible badge' : 'not-eligible badge'}">
+                    ${isEligibleForAnyCourse ? "✅ Eligible for at least one course" : "❌ Not Eligible for any course"}
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Ensure the report is generated after navigating to report.html
+    if (window.location.pathname.includes("report.html")) {
+        generateReport();
+    }
 });
