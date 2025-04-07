@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const submitBtn = document.createElement("button");
       submitBtn.textContent = "📝 Submit Report";
       submitBtn.className = "submit-report-btn";
-      submitBtn.addEventListener("click", submitFinalReport);
+      submitBtn.addEventListener("click", () => submitFinalReport(submitBtn));
       btnContainer.appendChild(submitBtn);
     } else {
       console.error("❌ 'button-container' not found in DOM.");
@@ -143,11 +143,22 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Save Report to Server
-  function submitFinalReport() {
+  function submitFinalReport(button) {
     console.log("📝 Submit report clicked!");
 
     const reportData = JSON.parse(sessionStorage.getItem("reportData")) || [];
     const comments = document.querySelectorAll(".comment-box");
+
+    // Check if all comments are empty
+    const allCommentsEmpty = Array.from(comments).every(c => !c.value.trim());
+    if (allCommentsEmpty) {
+      alert("⚠️ Please add at least one comment before submitting.");
+      return;
+    }
+
+    // Disable button and show loading
+    button.disabled = true;
+    button.textContent = "⏳ Submitting...";
 
     reportData.forEach((learner, i) => {
       learner.comment = comments[i].value.trim();
@@ -168,11 +179,14 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((res) => res.json())
       .then((response) => {
-        alert("✅ Report submitted successfully.");
         console.log(response);
+        document.getElementById("button-container").innerHTML = `<p class="success-msg">✅ Report submitted successfully!</p>`;
+        sessionStorage.clear();
       })
       .catch((err) => {
         console.error("❌ Error saving report:", err);
+        button.disabled = false;
+        button.textContent = "📝 Submit Report";
         alert("❌ Failed to save report.");
       });
   }
@@ -233,10 +247,8 @@ document.addEventListener("DOMContentLoaded", function () {
               text = "Eligible";
             } else if (raw.includes("✘") || raw.includes("✗") || raw.includes("not eligible")) {
               text = "Not Eligible";
-            } else {
-              if (raw.includes("eligible") && !raw.includes("not")) {
-                text = "Eligible";
-              }
+            } else if (raw.includes("eligible") && !raw.includes("not")) {
+              text = "Eligible";
             }
           }
         }
@@ -244,8 +256,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const bgColor = td.classList.contains("eligible")
           ? [76, 175, 80]
           : td.classList.contains("not-eligible")
-          ? [244, 67, 54]
-          : [255, 255, 255];
+            ? [244, 67, 54]
+            : [255, 255, 255];
 
         rowData.push({
           content: text,
