@@ -100,6 +100,20 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
+          // Format the date
+          const uploadedDate = new Date(report.uploadDate).toLocaleDateString("en-IN");
+
+          // Create report metadata section
+          const metadataDiv = document.createElement("div");
+          metadataDiv.style.marginBottom = "20px";
+          metadataDiv.innerHTML = `
+            <h3 style="margin-bottom: 10px;">📄 Report Details</h3>
+            <p><strong>Batch Name:</strong> ${report.batchName}</p>
+            <p><strong>Center Code:</strong> ${report.centerCode}</p>
+            <p><strong>Uploaded By:</strong> ${report.uploadedBy}</p>
+            <p><strong>Date:</strong> ${uploadedDate}</p>
+          `;
+
           const table = document.createElement("table");
           table.border = "1";
           table.cellPadding = "8";
@@ -160,7 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
             table.appendChild(row);
           });
 
+          // Final render
           reportOutput.innerHTML = "";
+          reportOutput.appendChild(metadataDiv);
           reportOutput.appendChild(table);
         })
         .catch(err => {
