@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const formData = new FormData();
       formData.append("file", fileInput.files[0]);
 
-      fetch("http://localhost:5000/upload", {
+      fetch("https://learning-dashboard-zlb0.onrender.com/upload", {
         method: "POST",
         body: formData,
       })
