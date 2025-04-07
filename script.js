@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tableBody = document.getElementById("table-body");
   const tableHeaderRow = document.getElementById("table-header-row");
 
+  // Handle Upload Page
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -54,9 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Generate Report Logic
   function generateReport() {
-    console.log("✅ Generating report...");
-
     const centerCode = sessionStorage.getItem("centerCode");
     const batchName = sessionStorage.getItem("batchName");
     const uploadedBy = sessionStorage.getItem("uploadedBy");
@@ -74,9 +74,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("uploadedBy").textContent = uploadedBy;
     document.getElementById("uploadDate").textContent = uploadDate;
 
+    // Headers
     tableHeaderRow.innerHTML = `<th>#</th><th>Learner Code</th><th>Learner Name</th>`;
     const courseNames = Object.keys(reportData[0].courses || {});
-    courseNames.forEach(course => {
+    courseNames.forEach((course) => {
       tableHeaderRow.innerHTML += `
         <th>${course} Classroom</th>
         <th>${course} Lab</th>
@@ -97,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       let isEligibleForAnyCourse = false;
 
-      courseNames.forEach(course => {
+      courseNames.forEach((course) => {
         const courseData = learner.courses[course];
         const classroomMarks = courseData.classroomMarks ?? "";
         const labMarks = courseData.labMarks ?? "";
@@ -131,11 +132,10 @@ document.addEventListener("DOMContentLoaded", function () {
       submitBtn.className = "submit-report-btn";
       submitBtn.addEventListener("click", submitFinalReport);
       btnContainer.appendChild(submitBtn);
-    } else {
-      console.error("❌ 'button-container' not found in DOM.");
     }
   }
 
+  // Submit Final Report
   function submitFinalReport() {
     console.log("📝 Submit report clicked!");
 
@@ -154,23 +154,17 @@ document.addEventListener("DOMContentLoaded", function () {
       data: reportData,
     };
 
-    console.log("📦 Payload being sent:", payload);
-
     fetch("https://learning-dashboard-zlb0.onrender.com/save-report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
       .then(async (res) => {
-        const contentType = res.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          const response = await res.json();
-          console.log("✅ Response received:", response);
-          document.getElementById("button-container").innerHTML = `<p class="success-msg">✅ Report submitted successfully!</p>`;
+        const text = await res.text();
+        if (res.ok && text.toLowerCase().includes("success")) {
+          alert("✅ " + text);
           sessionStorage.clear();
         } else {
-          const text = await res.text();
-          console.error("❌ Server did not return JSON:", text);
           alert("❌ Server error: " + text);
         }
       })
@@ -180,6 +174,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
+  // PDF Download
   function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const centerCode = sessionStorage.getItem("centerCode");
@@ -187,22 +182,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const uploadedBy = document.getElementById("uploadedBy").textContent;
     const uploadDate = document.getElementById("uploadDate").textContent;
 
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: [380, 210],
-    });
-
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: [380, 210] });
     pdf.setFillColor(244, 246, 249);
     pdf.rect(0, 0, 380, 210, "F");
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
-    pdf.setTextColor(33, 33, 33);
+    pdf.setFont("helvetica", "bold").setFontSize(14).setTextColor(33, 33, 33);
     pdf.text(batchName, 14, 15);
 
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal").setFontSize(11);
     pdf.text(`Center Code: ${centerCode}`, 14, 21);
     pdf.text(`Uploaded By: ${uploadedBy}`, 14, 27);
     pdf.text(`Date: ${uploadDate}`, 14, 33);
@@ -211,11 +198,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const headers = [];
     const body = [];
 
-    const headerCells = table.querySelectorAll("thead tr th");
-    headerCells.forEach(th => headers.push(th.textContent.trim()));
-
-    const rows = table.querySelectorAll("tbody tr");
-    rows.forEach(row => {
+    table.querySelectorAll("thead tr th").forEach((th) => headers.push(th.textContent.trim()));
+    table.querySelectorAll("tbody tr").forEach((row) => {
       const rowData = [];
       const cells = row.querySelectorAll("td");
 
@@ -226,16 +210,11 @@ document.addEventListener("DOMContentLoaded", function () {
           text = textarea ? textarea.value.trim() : "";
         } else {
           text = td.textContent.trim();
-          const isStatusColumn = headers[i]?.toLowerCase().includes("status");
-          if (isStatusColumn) {
+          const isStatus = headers[i]?.toLowerCase().includes("status");
+          if (isStatus) {
             const raw = text.toLowerCase();
-            if (raw.includes("✔") || raw.includes("✓")) {
-              text = "Eligible";
-            } else if (raw.includes("✘") || raw.includes("✗") || raw.includes("not eligible")) {
-              text = "Not Eligible";
-            } else if (raw.includes("eligible") && !raw.includes("not")) {
-              text = "Eligible";
-            }
+            if (raw.includes("✔") || raw.includes("✓")) text = "Eligible";
+            else if (raw.includes("✘") || raw.includes("✗") || raw.includes("not eligible")) text = "Not Eligible";
           }
         }
 
@@ -263,12 +242,11 @@ document.addEventListener("DOMContentLoaded", function () {
     pdf.autoTable({
       startY: 38,
       head: [headers],
-      body: body,
+      body,
       styles: {
         font: "helvetica",
         fontSize: 8.5,
         cellPadding: 2,
-        overflow: "linebreak",
         lineColor: [0, 0, 0],
         lineWidth: 0.1,
       },
@@ -289,12 +267,14 @@ document.addEventListener("DOMContentLoaded", function () {
     pdf.save("Batch_Report.pdf");
   }
 
+  // Init report.html
   if (window.location.pathname.includes("report.html")) {
     generateReport();
     const pdfBtn = document.getElementById("downloadPDF");
     if (pdfBtn) pdfBtn.addEventListener("click", downloadPDF);
   }
 
+  // View reports from homepage
   const viewBtn = document.getElementById("viewReportsBtn");
   if (viewBtn) {
     viewBtn.addEventListener("click", () => {
