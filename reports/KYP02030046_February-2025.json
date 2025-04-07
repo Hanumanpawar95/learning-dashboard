@@ -1,0 +1,710 @@
+{
+  "centerCode": "KYP02030046",
+  "batchName": "February-2025",
+  "uploadedBy": "Krish Kumar",
+  "data": [
+    {
+      "code": "3402021023071451",
+      "name": "SURAJ  KUMAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.18 / 20",
+          "labMarks": "16.99 / 60",
+          "sessionCount": "19 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "5.9 / 20",
+          "labMarks": "19.5 / 60",
+          "sessionCount": "12 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6.8 / 20",
+          "labMarks": "18 / 60",
+          "sessionCount": "6 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": "This Learner will be attend the class from today"
+    },
+    {
+      "code": "3653268725022451",
+      "name": "SACHIN KUMAR YADAV",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "0.33 / 20",
+          "labMarks": "0.9 / 60",
+          "sessionCount": "1 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "0.4 / 20",
+          "labMarks": "3 / 60",
+          "sessionCount": "1 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "0 / 20",
+          "labMarks": "0 / 60",
+          "sessionCount": "0 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653268825022451",
+      "name": "AFSHANA  KHATOON",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.8 / 20",
+          "labMarks": "19.66 / 60",
+          "sessionCount": "22 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "7.4 / 20",
+          "labMarks": "22.5 / 60",
+          "sessionCount": "14 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8.8 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "8 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653268925022451",
+      "name": "LABH  RAJ",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.33 / 20",
+          "labMarks": "18.55 / 60",
+          "sessionCount": "22 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.9 / 20",
+          "labMarks": "22.5 / 60",
+          "sessionCount": "14 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8.6 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "8 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653269025022451",
+      "name": "SHUBH  RAJ",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.47 / 20",
+          "labMarks": "18.83 / 60",
+          "sessionCount": "22 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.8 / 20",
+          "labMarks": "22.5 / 60",
+          "sessionCount": "14 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "7.8 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "8 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653269225022451",
+      "name": "BHAVANI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "4.95 / 20",
+          "labMarks": "13.63 / 60",
+          "sessionCount": "15 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "4.5 / 20",
+          "labMarks": "15 / 60",
+          "sessionCount": "9 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6 / 20",
+          "labMarks": "18 / 60",
+          "sessionCount": "6 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653269325022451",
+      "name": "HARSH  RAJ",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.35 / 20",
+          "labMarks": "19.69 / 60",
+          "sessionCount": "22 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "7.4 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "15 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "7 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653269425022451",
+      "name": "BABLI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.66 / 20",
+          "labMarks": "17.65 / 60",
+          "sessionCount": "19 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.3 / 20",
+          "labMarks": "19.5 / 60",
+          "sessionCount": "12 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "7.6 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "7 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653269525022451",
+      "name": "SHIVAM KUMAR ROY",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "8.15 / 20",
+          "labMarks": "20.69 / 60",
+          "sessionCount": "24 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "7.9 / 20",
+          "labMarks": "25.5 / 60",
+          "sessionCount": "16 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8.4 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "8 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653966125022451",
+      "name": "SARITA  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "0.99 / 20",
+          "labMarks": "2.7 / 60",
+          "sessionCount": "3 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "1 / 20",
+          "labMarks": "4.5 / 60",
+          "sessionCount": "2 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "1 / 20",
+          "labMarks": "3 / 60",
+          "sessionCount": "1 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653966225022451",
+      "name": "KUMKUM  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "1.65 / 20",
+          "labMarks": "3.32 / 60",
+          "sessionCount": "4 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "1.5 / 20",
+          "labMarks": "6 / 60",
+          "sessionCount": "3 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "1.8 / 20",
+          "labMarks": "3 / 60",
+          "sessionCount": "1 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653966425022451",
+      "name": "HIMANSHU  GUPTA",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.6 / 20",
+          "labMarks": "16.91 / 60",
+          "sessionCount": "20 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.3 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "13 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6.8 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "7 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653966525022451",
+      "name": "HIMSUTA  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "4.65 / 20",
+          "labMarks": "10.88 / 60",
+          "sessionCount": "14 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "4.5 / 20",
+          "labMarks": "13.5 / 60",
+          "sessionCount": "8 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6 / 20",
+          "labMarks": "15 / 60",
+          "sessionCount": "5 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653974625022451",
+      "name": "KAJAL  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "4.52 / 20",
+          "labMarks": "11.85 / 60",
+          "sessionCount": "12 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "4.2 / 20",
+          "labMarks": "13.5 / 60",
+          "sessionCount": "8 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "4.6 / 20",
+          "labMarks": "12 / 60",
+          "sessionCount": "4 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653974725022451",
+      "name": "SURAJ  KUMAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "4.62 / 20",
+          "labMarks": "10.85 / 60",
+          "sessionCount": "13 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "4.3 / 20",
+          "labMarks": "13.5 / 60",
+          "sessionCount": "8 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "4.4 / 20",
+          "labMarks": "12 / 60",
+          "sessionCount": "4 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3653975125022451",
+      "name": "RANI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.53 / 20",
+          "labMarks": "16.96 / 60",
+          "sessionCount": "19 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.9 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "13 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "5.6 / 20",
+          "labMarks": "15 / 60",
+          "sessionCount": "5 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3654449925022451",
+      "name": "ADITYA  KUMAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.92 / 20",
+          "labMarks": "19.23 / 60",
+          "sessionCount": "23 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "7.8 / 20",
+          "labMarks": "24 / 60",
+          "sessionCount": "15 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "7 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656404825022451",
+      "name": "RITIKA KUMARI LAHKAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.86 / 20",
+          "labMarks": "17.78 / 60",
+          "sessionCount": "20 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.8 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "13 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "7 / 20",
+          "labMarks": "18 / 60",
+          "sessionCount": "6 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656405325022451",
+      "name": "ABHISHEK  KUMAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "7.92 / 20",
+          "labMarks": "20.66 / 60",
+          "sessionCount": "24 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "8 / 20",
+          "labMarks": "25.5 / 60",
+          "sessionCount": "16 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "8 / 20",
+          "labMarks": "22.5 / 60",
+          "sessionCount": "7 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656405525022451",
+      "name": "HRITIK  KUMAR",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.2 / 20",
+          "labMarks": "15.04 / 60",
+          "sessionCount": "18 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "5.9 / 20",
+          "labMarks": "19.5 / 60",
+          "sessionCount": "12 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6.8 / 20",
+          "labMarks": "18 / 60",
+          "sessionCount": "6 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656405625022451",
+      "name": "ROUSHNI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "2.31 / 20",
+          "labMarks": "5.98 / 60",
+          "sessionCount": "7 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "2.4 / 20",
+          "labMarks": "7.5 / 60",
+          "sessionCount": "4 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "2 / 20",
+          "labMarks": "6 / 60",
+          "sessionCount": "2 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656405725022451",
+      "name": "SUJATA  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "5.89 / 20",
+          "labMarks": "14.83 / 60",
+          "sessionCount": "17 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6 / 20",
+          "labMarks": "19.5 / 60",
+          "sessionCount": "12 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "6 / 20",
+          "labMarks": "15 / 60",
+          "sessionCount": "5 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3656730225022451",
+      "name": "sahil  sinha",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "3.56 / 20",
+          "labMarks": "9.26 / 60",
+          "sessionCount": "11 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "3.9 / 20",
+          "labMarks": "10.5 / 60",
+          "sessionCount": "7 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "3 / 20",
+          "labMarks": "9 / 60",
+          "sessionCount": "3 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3657383825022451",
+      "name": "KHUSHI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "4.62 / 20",
+          "labMarks": "12.42 / 60",
+          "sessionCount": "14 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "4.5 / 20",
+          "labMarks": "13.5 / 60",
+          "sessionCount": "8 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "5 / 20",
+          "labMarks": "15 / 60",
+          "sessionCount": "5 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3657384125022451",
+      "name": "DURGA  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "2.31 / 20",
+          "labMarks": "6.01 / 60",
+          "sessionCount": "7 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "2.3 / 20",
+          "labMarks": "9 / 60",
+          "sessionCount": "5 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "2 / 20",
+          "labMarks": "6 / 60",
+          "sessionCount": "2 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": "3657384525022451",
+      "name": "MONI  KUMARI",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "6.84 / 20",
+          "labMarks": "16.82 / 60",
+          "sessionCount": "20 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "6.6 / 20",
+          "labMarks": "21 / 60",
+          "sessionCount": "13 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "5.8 / 20",
+          "labMarks": "18 / 60",
+          "sessionCount": "6 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    },
+    {
+      "code": " ",
+      "name": " ",
+      "courses": {
+        "BS-CIT": {
+          "classroomMarks": "0 / 20",
+          "labMarks": "0 / 60",
+          "sessionCount": "0 / 60",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CLS": {
+          "classroomMarks": "0 / 20",
+          "labMarks": "0 / 60",
+          "sessionCount": "0 / 40",
+          "eligible": "❌ Not Eligible"
+        },
+        "BS-CSS": {
+          "classroomMarks": "0 / 20",
+          "labMarks": "0 / 60",
+          "sessionCount": "0 / 20",
+          "eligible": "❌ Not Eligible"
+        }
+      },
+      "eligible": "❌ Not Eligible for any course",
+      "comment": ""
+    }
+  ],
+  "savedAt": "2025-04-07T06:50:01.896Z"
+}

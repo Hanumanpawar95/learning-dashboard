@@ -1,0 +1,50 @@
+<!-- view.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Uploaded Reports</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      text-align: center;
+      background-color: #f7f7f7;
+    }
+
+    select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔎 View Uploaded Batch Reports</h2>
+
+  <label for="centerCodeSelect">Select Center Code:</label><br>
+  <select id="centerCodeSelect">
+    <option value="">Loading...</option>
+  </select><br><br>
+
+  <label for="batchNameSelect">Select Batch Name:</label><br>
+  <select id="batchNameSelect">
+    <option value="">Please select center first</option>
+  </select><br><br>
+
+  <button id="viewReportBtn">📄 View Report</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
