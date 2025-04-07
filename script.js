@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const tableBody = document.getElementById("table-body");
   const tableHeaderRow = document.getElementById("table-header-row");
 
-  // Upload page logic
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -55,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Report generation logic
   function generateReport() {
     console.log("✅ Generating report...");
 
@@ -76,7 +74,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("uploadedBy").textContent = uploadedBy;
     document.getElementById("uploadDate").textContent = uploadDate;
 
-    // Table Headers
     tableHeaderRow.innerHTML = `<th>#</th><th>Learner Code</th><th>Learner Name</th>`;
     const courseNames = Object.keys(reportData[0].courses || {});
     courseNames.forEach(course => {
@@ -127,38 +124,23 @@ document.addEventListener("DOMContentLoaded", function () {
       tableBody.appendChild(row);
     });
 
-    // Add Submit Report Button
-    console.log("✅ Appending submit button...");
-
     const btnContainer = document.getElementById("button-container");
     if (btnContainer) {
       const submitBtn = document.createElement("button");
       submitBtn.textContent = "📝 Submit Report";
       submitBtn.className = "submit-report-btn";
-      submitBtn.addEventListener("click", () => submitFinalReport(submitBtn));
+      submitBtn.addEventListener("click", submitFinalReport);
       btnContainer.appendChild(submitBtn);
     } else {
       console.error("❌ 'button-container' not found in DOM.");
     }
   }
 
-  // Save Report to Server
-  function submitFinalReport(button) {
+  function submitFinalReport() {
     console.log("📝 Submit report clicked!");
 
     const reportData = JSON.parse(sessionStorage.getItem("reportData")) || [];
     const comments = document.querySelectorAll(".comment-box");
-
-    // Check if all comments are empty
-    const allCommentsEmpty = Array.from(comments).every(c => !c.value.trim());
-    if (allCommentsEmpty) {
-      alert("⚠️ Please add at least one comment before submitting.");
-      return;
-    }
-
-    // Disable button and show loading
-    button.disabled = true;
-    button.textContent = "⏳ Submitting...";
 
     reportData.forEach((learner, i) => {
       learner.comment = comments[i].value.trim();
@@ -172,26 +154,32 @@ document.addEventListener("DOMContentLoaded", function () {
       data: reportData,
     };
 
+    console.log("📦 Payload being sent:", payload);
+
     fetch("https://learning-dashboard-zlb0.onrender.com/save-report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
-      .then((response) => {
-        console.log(response);
-        document.getElementById("button-container").innerHTML = `<p class="success-msg">✅ Report submitted successfully!</p>`;
-        sessionStorage.clear();
+      .then(async (res) => {
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const response = await res.json();
+          console.log("✅ Response received:", response);
+          document.getElementById("button-container").innerHTML = `<p class="success-msg">✅ Report submitted successfully!</p>`;
+          sessionStorage.clear();
+        } else {
+          const text = await res.text();
+          console.error("❌ Server did not return JSON:", text);
+          alert("❌ Server error: " + text);
+        }
       })
       .catch((err) => {
         console.error("❌ Error saving report:", err);
-        button.disabled = false;
-        button.textContent = "📝 Submit Report";
         alert("❌ Failed to save report.");
       });
   }
 
-  // PDF Download Function
   function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const centerCode = sessionStorage.getItem("centerCode");
@@ -233,13 +221,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       cells.forEach((td, i) => {
         let text = "";
-
         if (i === cells.length - 1) {
           const textarea = td.querySelector("textarea");
           text = textarea ? textarea.value.trim() : "";
         } else {
           text = td.textContent.trim();
-
           const isStatusColumn = headers[i]?.toLowerCase().includes("status");
           if (isStatusColumn) {
             const raw = text.toLowerCase();
@@ -256,8 +242,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const bgColor = td.classList.contains("eligible")
           ? [76, 175, 80]
           : td.classList.contains("not-eligible")
-            ? [244, 67, 54]
-            : [255, 255, 255];
+          ? [244, 67, 54]
+          : [255, 255, 255];
 
         rowData.push({
           content: text,
@@ -303,14 +289,12 @@ document.addEventListener("DOMContentLoaded", function () {
     pdf.save("Batch_Report.pdf");
   }
 
-  // Init Report Page
   if (window.location.pathname.includes("report.html")) {
     generateReport();
     const pdfBtn = document.getElementById("downloadPDF");
     if (pdfBtn) pdfBtn.addEventListener("click", downloadPDF);
   }
 
-  // View Button on Home Page
   const viewBtn = document.getElementById("viewReportsBtn");
   if (viewBtn) {
     viewBtn.addEventListener("click", () => {
