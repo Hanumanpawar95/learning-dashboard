@@ -118,7 +118,7 @@ app.post("/save-report", (req, res) => {
         batchName,
         uploadedBy,
         data,
-        savedAt: new Date().toISOString()
+        uploadDate: new Date().toISOString()
     };
 
     fs.writeFile(filepath, JSON.stringify(reportData, null, 2), (err) => {
