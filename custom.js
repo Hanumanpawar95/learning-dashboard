@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
       passwordModal.style.display = "none";
 
       // Fetch the report
-      fetch(`http://localhost:5000/get-report?center=${center}&batch=${batch}`)
+      fetch(`https://learning-dashboard-zlb0.onrender.com/get-report?center=${center}&batch=${batch}`)
         .then(res => {
           if (!res.ok) throw new Error("Report not found");
           return res.json();
