@@ -100,18 +100,23 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          // Format the date
-          const uploadedDate = new Date(report.uploadDate).toLocaleDateString("en-IN");
+          // 🟢 Format Upload Date safely
+          let uploadedDate = "Unknown";
+          if (report.uploadDate) {
+            const date = new Date(report.uploadDate);
+            uploadedDate = isNaN(date.getTime())
+              ? report.uploadDate
+              : date.toLocaleDateString("en-IN");
+          }
 
-          // Create report metadata section
-          const metadataDiv = document.createElement("div");
-          metadataDiv.style.marginBottom = "20px";
-          metadataDiv.innerHTML = `
-            <h3 style="margin-bottom: 10px;">📄 Report Details</h3>
-            <p><strong>Batch Name:</strong> ${report.batchName}</p>
-            <p><strong>Center Code:</strong> ${report.centerCode}</p>
-            <p><strong>Uploaded By:</strong> ${report.uploadedBy}</p>
-            <p><strong>Date:</strong> ${uploadedDate}</p>
+          // 🟡 Report Header Info
+          const reportHeader = `
+            <div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border: 1px solid #ccc;">
+              <strong>Batch Name:</strong> ${report.batchName || batch}<br>
+              <strong>Center Code:</strong> ${report.centerCode || center}<br>
+              <strong>Uploaded By:</strong> ${report.uploadedBy || "Unknown"}<br>
+              <strong>Date:</strong> ${uploadedDate}
+            </div>
           `;
 
           const table = document.createElement("table");
@@ -174,9 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
             table.appendChild(row);
           });
 
-          // Final render
-          reportOutput.innerHTML = "";
-          reportOutput.appendChild(metadataDiv);
+          reportOutput.innerHTML = reportHeader;
           reportOutput.appendChild(table);
         })
         .catch(err => {
