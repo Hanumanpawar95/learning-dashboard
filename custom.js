@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     submitPasswordBtn.onclick = () => {
       const password = passwordInput.value;
-      if (password !== "admin123") {
+      if (password !== "Mkcl4311") {
         alert("❌ Incorrect password. Access denied.");
         passwordModal.style.display = "none";
         return;
