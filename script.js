@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
       data: reportData,
     };
 
-    fetch("http://localhost:5000/save-report", {
+    fetch("https://learning-dashboard-zlb0.onrender.com/save-report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
