@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!centerDropdown || !batchDropdown || !reportOutput) return;
 
   // Step 1: Load metadata and group by center
-  fetch("http://localhost:5000/get-reports-metadata")
+  fetch("https://learning-dashboard-zlb0.onrender.com/get-reports-metadata")
     .then(res => res.json())
     .then(metadata => {
       const grouped = {};
