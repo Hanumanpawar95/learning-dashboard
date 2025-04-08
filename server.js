@@ -33,9 +33,24 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
+// 🧠 Google Auth: decode base64 from env and save JSON
+const googleCredsBase64 = process.env.GOOGLE_CREDENTIALS_B64;
+const serviceAccountPath = path.join(__dirname, "service-account.json");
+
+if (googleCredsBase64) {
+  try {
+    fs.writeFileSync(serviceAccountPath, Buffer.from(googleCredsBase64, "base64").toString("utf8"));
+    console.log("✅ Google credentials written to service-account.json");
+  } catch (err) {
+    console.error("❌ Error writing service account JSON:", err);
+  }
+} else {
+  console.error("❌ GOOGLE_CREDENTIALS_B64 environment variable not set.");
+}
+
 // 📤 Google Drive setup
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "engaged-hook-433304-d6-362b445a3fbc.json"), // ✅ Your actual JSON file
+  keyFile: serviceAccountPath,
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
@@ -140,10 +155,7 @@ app.post("/save-report", async (req, res) => {
 
     // Save to Google Drive
     try {
-      const fileMetadata = {
-        name: filename,
-      };
-
+      const fileMetadata = { name: filename };
       const media = {
         mimeType: "application/json",
         body: fs.createReadStream(filepath),
