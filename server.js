@@ -107,7 +107,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 📤 Save report directly to Google Drive
+// 📤 Save or update report on Google Drive
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
@@ -128,25 +128,55 @@ app.post("/save-report", async (req, res) => {
   bufferStream.end(Buffer.from(fileContent));
 
   const filename = `${centerCode}_${batchName}.json`;
+  const folderId = "1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"; // Your folder ID
 
   try {
-    const driveResponse = await driveService.files.create({
-      resource: {
-        name: filename,
-        parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
-      },
-      media: {
-        mimeType: "application/json",
-        body: bufferStream,
-      },
-      fields: "id",
+    // 🔍 Check if file already exists
+    const listRes = await driveService.files.list({
+      q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
+      fields: "files(id, name)",
     });
 
-    console.log("📤 Uploaded to Google Drive:", driveResponse.data.id);
-    res.status(200).json({ message: "Report uploaded to Google Drive", fileId: driveResponse.data.id });
+    if (listRes.data.files.length > 0) {
+      // ✅ File exists – update it
+      const fileId = listRes.data.files[0].id;
+
+      await driveService.files.update({
+        fileId: fileId,
+        media: {
+          mimeType: "application/json",
+          body: bufferStream,
+        },
+      });
+
+      console.log("♻️ File updated on Google Drive:", fileId);
+      return res.status(200).json({
+        message: "File updated on Google Drive",
+        fileId,
+      });
+    } else {
+      // 🆕 File doesn't exist – create new
+      const createRes = await driveService.files.create({
+        resource: {
+          name: filename,
+          parents: [folderId],
+        },
+        media: {
+          mimeType: "application/json",
+          body: bufferStream,
+        },
+        fields: "id",
+      });
+
+      console.log("📤 New file created on Google Drive:", createRes.data.id);
+      return res.status(200).json({
+        message: "Report uploaded to Google Drive",
+        fileId: createRes.data.id,
+      });
+    }
   } catch (err) {
-    console.error("❌ Google Drive upload failed:", err.message);
-    res.status(500).send("Google Drive upload failed");
+    console.error("❌ Google Drive operation failed:", err.message);
+    res.status(500).json({ error: "Google Drive upload/update failed" });
   }
 });
 
