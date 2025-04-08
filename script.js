@@ -160,14 +160,14 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify(payload),
     })
       .then(async (res) => {
-        const text = await res.text();
-        if (res.ok && text.toLowerCase().includes("success")) {
-          alert("✅ " + text);
-          sessionStorage.clear();
-        } else {
-          alert("❌ Server error: " + text);
-        }
-      })
+  const data = await res.json();
+  if (res.ok) {
+    alert("✅ " + data.message + "\n📄 File ID: " + data.fileId);
+    sessionStorage.clear();
+  } else {
+    alert("❌ Server error: " + (data.message || "Unknown error"));
+  }
+})
       .catch((err) => {
         console.error("❌ Error saving report:", err);
         alert("❌ Failed to save report.");
