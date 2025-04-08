@@ -5,34 +5,45 @@ const csv = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
 
+const { google } = require("googleapis");
+const dotenv = require("dotenv");
+dotenv.config();
+
 const app = express();
-const port = process.env.PORT || 5000; 
+const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // To serve frontend files if needed
+app.use(express.static("public"));
 
-// Ensure directories exist
 const uploadDir = path.join(__dirname, "uploads");
 const reportsDir = path.join(__dirname, "reports");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir);
 
-// Multer setup
+// 🔐 Load Google Service Account
+const auth = new google.auth.GoogleAuth({
+    credentials: require("./google.json"),
+    scopes: ["https://www.googleapis.com/auth/drive.file"]
+});
+
+const drive = google.drive({ version: "v3", auth });
+
+// 📦 Multer storage config
 const storage = multer.diskStorage({
     destination: uploadDir,
     filename: (req, file, cb) => cb(null, "uploaded_data.csv")
 });
 const upload = multer({ storage });
 
-// Eligibility Criteria
+// ✅ Eligibility Criteria
 const eligibilityCriteria = {
     "BS-CIT": { classroomMin: 8, labMin: 36, sessionMin: 48, classroomMax: 20, labMax: 60, sessionMax: 60 },
     "BS-CLS": { classroomMin: 8, labMin: 36, sessionMin: 32, classroomMax: 20, labMax: 60, sessionMax: 40 },
     "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// Upload & process CSV
+// 📥 Upload & process CSV
 app.post("/upload", upload.single("file"), (req, res) => {
     if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
@@ -74,7 +85,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
         });
 });
 
-// Helper function to check eligibility
+// 🔍 Check course eligibility
 function processCourse(row, course) {
     const extractMarks = (value, max) => {
         if (!value) return { actual: 0, max: max };
@@ -102,8 +113,8 @@ function processCourse(row, course) {
     };
 }
 
-// Save processed report
-app.post("/save-report", (req, res) => {
+// 💾 Save report locally + 📤 Upload to Google Drive
+app.post("/save-report", async (req, res) => {
     const { centerCode, batchName, uploadedBy, data } = req.body;
 
     if (!centerCode || !batchName || !uploadedBy || !data) {
@@ -121,17 +132,37 @@ app.post("/save-report", (req, res) => {
         uploadDate: new Date().toISOString()
     };
 
-    fs.writeFile(filepath, JSON.stringify(reportData, null, 2), (err) => {
+    fs.writeFile(filepath, JSON.stringify(reportData, null, 2), async (err) => {
         if (err) {
             console.error("❌ Failed to save report:", err);
             return res.status(500).send("Failed to save report");
         }
-        console.log("✅ Report saved:", filename);
-        res.status(200).send("Report saved successfully");
+
+        console.log("✅ Report saved locally:", filename);
+
+        // Upload to Google Drive
+        try {
+            const response = await drive.files.create({
+                requestBody: {
+                    name: filename,
+                    mimeType: "application/json"
+                },
+                media: {
+                    mimeType: "application/json",
+                    body: fs.createReadStream(filepath)
+                }
+            });
+
+            console.log("✅ Report uploaded to Google Drive:", response.data.id);
+            res.status(200).send("Report saved and uploaded to Drive successfully");
+        } catch (uploadErr) {
+            console.error("❌ Google Drive Upload Error:", uploadErr);
+            res.status(500).send("Saved locally but failed to upload to Google Drive");
+        }
     });
 });
 
-// Get all reports metadata for dropdowns
+// 📁 Get all reports metadata
 app.get("/get-reports-metadata", (req, res) => {
     fs.readdir(reportsDir, (err, files) => {
         if (err) {
@@ -150,7 +181,7 @@ app.get("/get-reports-metadata", (req, res) => {
     });
 });
 
-// Get specific report
+// 📤 Get specific report
 app.get("/get-report", (req, res) => {
     const { center, batch } = req.query;
 
