@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // To serve frontend files if needed
+app.use(express.static("public")); // Optional for frontend files
 
 // 📁 Ensure directories exist
 const uploadDir = path.join(__dirname, "uploads");
@@ -33,24 +33,9 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 🧠 Google Auth: decode base64 from env and save JSON
-const googleCredsBase64 = process.env.GOOGLE_CREDENTIALS_B64;
-const serviceAccountPath = path.join(__dirname, "service-account.json");
-
-if (googleCredsBase64) {
-  try {
-    fs.writeFileSync(serviceAccountPath, Buffer.from(googleCredsBase64, "base64").toString("utf8"));
-    console.log("✅ Google credentials written to service-account.json");
-  } catch (err) {
-    console.error("❌ Error writing service account JSON:", err);
-  }
-} else {
-  console.error("❌ GOOGLE_CREDENTIALS_B64 environment variable not set.");
-}
-
 // 📤 Google Drive setup
 const auth = new google.auth.GoogleAuth({
-  keyFile: serviceAccountPath,
+  keyFile: path.join(__dirname, "engaged-hook-433304-d6-ca2f2d8a3c17.json"), // Your service account key
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
@@ -144,7 +129,6 @@ app.post("/save-report", async (req, res) => {
     uploadDate: new Date().toISOString(),
   };
 
-  // Save locally
   fs.writeFile(filepath, JSON.stringify(reportData, null, 2), async (err) => {
     if (err) {
       console.error("❌ Failed to save report:", err);
@@ -153,9 +137,12 @@ app.post("/save-report", async (req, res) => {
 
     console.log("✅ Report saved locally:", filename);
 
-    // Save to Google Drive
     try {
-      const fileMetadata = { name: filename };
+      const fileMetadata = {
+        name: filename,
+        parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
+      };
+
       const media = {
         mimeType: "application/json",
         body: fs.createReadStream(filepath),
