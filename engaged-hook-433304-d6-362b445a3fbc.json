@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "engaged-hook-433304-d6",
+  "private_key_id": "362b445a3fbc01bdb6916693625a2c755051cc90",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDCeZ32LXkO4O/4\npU5IX9tsKpF3YYOzg3Osf5KRrFpxqw0csJD7n88HfwemZPz9lqAL1X3+TIiYy4C/\nkukVIIOLGiP/e4YWOCgiCjmR8KnCPdpxc6qb4nUnoAy3XxoXW8LajYcS478ksh0a\nj7HOGZSC0FBbBiaPOtJ6V2f4IoVyOPl/b7zdSSp6BQ7D9X4VF8g5AD97JqQcFNfJ\nXg3vKXNME43fZwbA5/d39pLp101K9x7MS3aitYRekQRsfP7V8m00dYYclA/36Ga8\nEnoG+TFSnQ1cSUyoRzArYFO+g0t6/Jo3Vn4c+oB5Y+dTXBFnQtzztBjVEtvIRYX+\nhEDz4FNzAgMBAAECggEAB7ZY/FVLUrq66Ypss1QR2JVLlYdpeKoC4Vlhz6MdJxrY\nd0XNSh1JUYvJGuEwY0Ig8Lczuu0AEccoQPCri6nxbYfI263jYGgztz3ekJoRsWFQ\nk2U549q0OLERMAh2eWyrKo2oSKh9gRALNW1zaK/9Ar8OIL36s31qsW1b8ywzTJdC\nH8ahhnNpdkff1isOUJVmpnCKnipjBwNTAaiF0odoXRIYI5iRBUAVncEBUNV3I5+P\nIEk7hYBYlY9Wmq8fIZdsS2SVVZ7p7MUu3Wrh3p25LiLcsDXfEUfRbqliVguXxWip\njHZFtyl1oAr0pv+QYv5WU7Q8wBJHCN7AU29lCMzrWQKBgQDn+zZ6B2xCdmrCO6YH\nqCFcXHTY0Qn1oKb7YGeDgX98pxOzh2mLLbd2ozAB3PDga3yx9aDtCRxO8mAmHYGD\nR5Q8k1OcBjDRHCS6ki4h2mQOylcfoWVw9MXpgBFmPjHCI3yCpUi1LshGlRinw+ff\nmzgO44p2OumYu8DkdwpDXHp4/wKBgQDWnEga1iojcIKMjYqc+XNk4j0WnQLbECDu\nVrBDZ7s2ISl/XFpny2wbyWMTSFEaUlu3z9WZx7WRbisjpmDbU2kidrD2YTkItwNw\nBRP9aDb9UDkK4PRHvXb2PxNV94KCP+qS+mHiywPBYKQ5KZWMQ1op9YMgWwUzX3nG\n15WGMN1RjQKBgAEUYTeGK1HP3UVUI7yrYqRcZcrQhjxXaA+JblHlW2OIH4ZZXftg\n1ha+Qa3wikpxFZ56ZypTPYd8h0gGISEsRxtVEDGMsdN3TxBzN7W+n3KWLHugM6mn\n6ffhObOBHJgrtBuji0gUlKgHb5rwRXb78PHYyz8rnQSx8v7dMvYHSyafAoGAJI+5\nZQEJasI3K3TNoZKJyy0T1S9oliN4SMJyAvnAFieuJyl3qWkpgM5dV6KhVoejYnxA\n2pMAZsdLCCbHJ3ZdWea4nTDRA6ASMNpcnnZLr/ojzaunUjV/99GlHKcvD7uN3f5U\nAMwvVpl9QNPJy3yJ9s4BydhX2XmxiGOf8J2Qht0CgYAFS9loPA/TFnhxx9KDfU6p\nxzfpWKw4o9iFBBu9vsvNXAWVxFz8m9+PtegF9rFn7/kff+2x07V4vNmLIVbeW22w\nxtZZMRUoP/3ifhYmG/tKFe5YzDHVR8LQZFEtacL5/AEx/eBaowuFVv5gAqLZ7kzl\nLBAc56gVeoZ3Mc1higYo1g==\n-----END PRIVATE KEY-----\n",
+  "client_email": "learners-learning-report-drive@engaged-hook-433304-d6.iam.gserviceaccount.com",
+  "client_id": "102683977095782153287",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/learners-learning-report-drive%40engaged-hook-433304-d6.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
