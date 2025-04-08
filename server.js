@@ -5,6 +5,7 @@ const csv = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
 const { google } = require("googleapis");
+const { Readable } = require("stream"); // 🔧 Needed for Google Drive upload
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -31,9 +32,9 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 📤 Google Drive setup using env var
+// 📤 Google Drive setup
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+  keyFile: path.join(__dirname, "engaged-hook-433304-d6-ca2f2d8a3c17.json"),
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
@@ -80,7 +81,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 🔍 Helper for processing course eligibility
+// 🔍 Helper for processing
 function processCourse(row, course) {
   const extractMarks = (value, max) => {
     if (!value) return { actual: 0, max: max };
@@ -108,7 +109,7 @@ function processCourse(row, course) {
   };
 }
 
-// ☁️ Save report directly to Google Drive
+// 💾 Save report directly to Google Drive (no local file)
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
@@ -117,6 +118,7 @@ app.post("/save-report", async (req, res) => {
   }
 
   const filename = `${centerCode}_${batchName}.json`;
+
   const reportData = {
     centerCode,
     batchName,
@@ -133,7 +135,7 @@ app.post("/save-report", async (req, res) => {
 
     const media = {
       mimeType: "application/json",
-      body: Buffer.from(JSON.stringify(reportData, null, 2)),
+      body: Readable.from([JSON.stringify(reportData, null, 2)]),
     };
 
     const driveRes = await driveService.files.create({
@@ -146,7 +148,7 @@ app.post("/save-report", async (req, res) => {
     res.status(200).json({ message: "Report uploaded to Drive", fileId: driveRes.data.id });
   } catch (err) {
     console.error("❌ Google Drive upload failed:", err.message);
-    res.status(500).send("Google Drive upload failed");
+    res.status(500).send("Drive upload failed");
   }
 });
 
