@@ -24,7 +24,7 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 🔐 Google Auth setup (from env, fix private_key line breaks)
+// 🔐 Google Auth setup (fixing \n line breaks in private_key)
 let credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
 credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
 
@@ -32,9 +32,11 @@ const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
-const driveService = google.drive({ version: "v3", auth });
 
-// 🔍 Helper for processing each course
+const driveService = google.drive({ version: "v3", auth });
+const folderId = "1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"; // 📁 Your Drive folder ID
+
+// 🔍 Helper: Process each course row
 function processCourse(row, course) {
   const extractMarks = (value, max) => {
     if (!value) return { actual: 0, max };
@@ -62,7 +64,7 @@ function processCourse(row, course) {
   };
 }
 
-// 📤 Endpoint to upload and process CSV file
+// 📤 Endpoint: Upload and process CSV file
 app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
@@ -98,7 +100,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
       learners.push(learner);
     })
     .on("end", () => {
-      console.log("✅ Processing complete:", learners.length, "records processed.");
+      console.log("✅ CSV processing complete:", learners.length, "records");
       res.json(learners);
     })
     .on("error", (err) => {
@@ -107,7 +109,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 📤 Save or update report on Google Drive
+// 📤 Endpoint: Save or update report on Google Drive
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
@@ -128,17 +130,14 @@ app.post("/save-report", async (req, res) => {
   bufferStream.end(Buffer.from(fileContent));
 
   const filename = `${centerCode}_${batchName}.json`;
-  const folderId = "1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"; // Your folder ID
 
   try {
-    // 🔍 Check if file already exists
     const listRes = await driveService.files.list({
       q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
       fields: "files(id, name)",
     });
 
     if (listRes.data.files.length > 0) {
-      // ✅ File exists – update it
       const fileId = listRes.data.files[0].id;
 
       await driveService.files.update({
@@ -149,13 +148,9 @@ app.post("/save-report", async (req, res) => {
         },
       });
 
-      console.log("♻️ File updated on Google Drive:", fileId);
-      return res.status(200).json({
-        message: "File updated on Google Drive",
-        fileId,
-      });
+      console.log("♻️ File updated:", fileId);
+      return res.status(200).json({ message: "File updated", fileId });
     } else {
-      // 🆕 File doesn't exist – create new
       const createRes = await driveService.files.create({
         resource: {
           name: filename,
@@ -168,15 +163,67 @@ app.post("/save-report", async (req, res) => {
         fields: "id",
       });
 
-      console.log("📤 New file created on Google Drive:", createRes.data.id);
-      return res.status(200).json({
-        message: "Report uploaded to Google Drive",
-        fileId: createRes.data.id,
-      });
+      console.log("📤 New file created:", createRes.data.id);
+      return res.status(200).json({ message: "Report uploaded", fileId: createRes.data.id });
     }
   } catch (err) {
-    console.error("❌ Google Drive operation failed:", err.message);
+    console.error("❌ Google Drive error:", err.message);
     res.status(500).json({ error: "Google Drive upload/update failed" });
+  }
+});
+
+// 🆕 Endpoint: Fetch report metadata for dropdowns
+app.get("/get-reports-metadata", async (req, res) => {
+  try {
+    const result = await driveService.files.list({
+      q: `'${folderId}' in parents and mimeType='application/json' and trashed = false`,
+      fields: "files(id, name)",
+    });
+
+    const metadata = result.data.files.map(file => {
+      const [centerCode, batchNameWithExt] = file.name.split("_");
+      const batchName = batchNameWithExt.replace(".json", "");
+      return { centerCode, batchName };
+    });
+
+    res.json(metadata);
+  } catch (err) {
+    console.error("❌ Metadata fetch failed:", err.message);
+    res.status(500).json({ error: "Failed to fetch metadata" });
+  }
+});
+
+// 🆕 Endpoint: Fetch specific report by center & batch
+app.get("/get-report", async (req, res) => {
+  const { center, batch } = req.query;
+
+  if (!center || !batch) {
+    return res.status(400).json({ error: "Missing center or batch" });
+  }
+
+  const filename = `${center}_${batch}.json`;
+
+  try {
+    const result = await driveService.files.list({
+      q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
+      fields: "files(id, name)",
+    });
+
+    if (result.data.files.length === 0) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    const fileId = result.data.files[0].id;
+
+    const fileRes = await driveService.files.get({
+      fileId,
+      alt: "media",
+    });
+
+    res.json(fileRes.data);
+  } catch (err) {
+    console.error("❌ Report fetch failed:", err.message);
+    res.status(500).json({ error: "Failed to fetch report" });
   }
 });
 
