@@ -2,27 +2,19 @@ const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
 const csv = require("csv-parser");
-const fs = require("fs");
 const path = require("path");
 const { google } = require("googleapis");
-const { Readable } = require("stream"); // 🔧 Needed for Google Drive upload
+const stream = require("stream");
 
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // Optional for frontend files
+app.use(express.static("public"));
 
-// 📁 Ensure upload directory exists
-const uploadDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-
-// 📦 Multer setup
-const storage = multer.diskStorage({
-  destination: uploadDir,
-  filename: (req, file, cb) => cb(null, "uploaded_data.csv"),
-});
+// 📦 Multer setup for CSV upload
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // ✅ Eligibility Criteria
@@ -32,21 +24,52 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 📤 Google Drive setup
+// 🔐 Google Auth setup (read credentials from env variable)
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "engaged-hook-433304-d6-ca2f2d8a3c17.json"),
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
 
-// 📄 Upload CSV and process it
+// 🔍 Helper for processing each course
+function processCourse(row, course) {
+  const extractMarks = (value, max) => {
+    if (!value) return { actual: 0, max };
+    const parts = value.split("/");
+    return {
+      actual: parseFloat(parts[0]) || 0,
+      max: parts[1] ? parseFloat(parts[1]) : max,
+    };
+  };
+
+  const classroom = extractMarks(row[`${course} Classroom Internal Marks`], eligibilityCriteria[course].classroomMax);
+  const lab = extractMarks(row[`${course} Lab Internal Marks`], eligibilityCriteria[course].labMax);
+  const session = extractMarks(row[`${course} Completed Session Count`], eligibilityCriteria[course].sessionMax);
+
+  const eligible =
+    classroom.actual >= eligibilityCriteria[course].classroomMin &&
+    lab.actual >= eligibilityCriteria[course].labMin &&
+    session.actual >= eligibilityCriteria[course].sessionMin;
+
+  return {
+    classroomMarks: `${classroom.actual} / ${classroom.max}`,
+    labMarks: `${lab.actual} / ${lab.max}`,
+    sessionCount: `${session.actual} / ${session.max}`,
+    eligible: eligible ? "✅ Eligible" : "❌ Not Eligible",
+  };
+}
+
+// 📤 Endpoint to upload and process CSV file
 app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-  console.log("📂 File uploaded:", req.file.path);
-  let learners = [];
+  console.log("📂 File uploaded in memory");
 
-  fs.createReadStream(req.file.path)
+  const learners = [];
+  const bufferStream = new stream.PassThrough();
+  bufferStream.end(req.file.buffer);
+
+  bufferStream
     .pipe(csv())
     .on("data", (row) => {
       let learner = {
@@ -81,43 +104,13 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 🔍 Helper for processing
-function processCourse(row, course) {
-  const extractMarks = (value, max) => {
-    if (!value) return { actual: 0, max: max };
-    const parts = value.split("/");
-    return {
-      actual: parseFloat(parts[0]) || 0,
-      max: parts[1] ? parseFloat(parts[1]) : max,
-    };
-  };
-
-  const classroom = extractMarks(row[`${course} Classroom Internal Marks`], eligibilityCriteria[course].classroomMax);
-  const lab = extractMarks(row[`${course} Lab Internal Marks`], eligibilityCriteria[course].labMax);
-  const session = extractMarks(row[`${course} Completed Session Count`], eligibilityCriteria[course].sessionMax);
-
-  const eligible =
-    classroom.actual >= eligibilityCriteria[course].classroomMin &&
-    lab.actual >= eligibilityCriteria[course].labMin &&
-    session.actual >= eligibilityCriteria[course].sessionMin;
-
-  return {
-    classroomMarks: `${classroom.actual} / ${classroom.max}`,
-    labMarks: `${lab.actual} / ${lab.max}`,
-    sessionCount: `${session.actual} / ${session.max}`,
-    eligible: eligible ? "✅ Eligible" : "❌ Not Eligible",
-  };
-}
-
-// 💾 Save report directly to Google Drive (no local file)
+// 📤 Save report directly to Google Drive
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
   if (!centerCode || !batchName || !uploadedBy || !data) {
     return res.status(400).json({ error: "Missing required fields" });
   }
-
-  const filename = `${centerCode}_${batchName}.json`;
 
   const reportData = {
     centerCode,
@@ -127,28 +120,30 @@ app.post("/save-report", async (req, res) => {
     uploadDate: new Date().toISOString(),
   };
 
+  const fileContent = JSON.stringify(reportData, null, 2);
+  const bufferStream = new stream.PassThrough();
+  bufferStream.end(Buffer.from(fileContent));
+
+  const filename = `${centerCode}_${batchName}.json`;
+
   try {
-    const fileMetadata = {
-      name: filename,
-      parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
-    };
-
-    const media = {
-      mimeType: "application/json",
-      body: Readable.from([JSON.stringify(reportData, null, 2)]),
-    };
-
-    const driveRes = await driveService.files.create({
-      resource: fileMetadata,
-      media: media,
+    const driveResponse = await driveService.files.create({
+      resource: {
+        name: filename,
+        parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
+      },
+      media: {
+        mimeType: "application/json",
+        body: bufferStream,
+      },
       fields: "id",
     });
 
-    console.log("📤 Uploaded to Google Drive:", driveRes.data.id);
-    res.status(200).json({ message: "Report uploaded to Drive", fileId: driveRes.data.id });
+    console.log("📤 Uploaded to Google Drive:", driveResponse.data.id);
+    res.status(200).json({ message: "Report uploaded to Google Drive", fileId: driveResponse.data.id });
   } catch (err) {
     console.error("❌ Google Drive upload failed:", err.message);
-    res.status(500).send("Drive upload failed");
+    res.status(500).send("Google Drive upload failed");
   }
 });
 
