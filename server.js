@@ -13,11 +13,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static("public")); // Optional for frontend files
 
-// 📁 Ensure directories exist
+// 📁 Ensure upload directory exists
 const uploadDir = path.join(__dirname, "uploads");
-const reportsDir = path.join(__dirname, "reports");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-if (!fs.existsSync(reportsDir)) fs.mkdirSync(reportsDir);
 
 // 📦 Multer setup
 const storage = multer.diskStorage({
@@ -33,9 +31,9 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 📤 Google Drive setup
+// 📤 Google Drive setup using env var
 const auth = new google.auth.GoogleAuth({
-  keyFile: path.join(__dirname, "engaged-hook-433304-d6-ca2f2d8a3c17.json"), // Your service account key
+  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
@@ -82,7 +80,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 🔍 Helper for processing
+// 🔍 Helper for processing course eligibility
 function processCourse(row, course) {
   const extractMarks = (value, max) => {
     if (!value) return { actual: 0, max: max };
@@ -110,7 +108,7 @@ function processCourse(row, course) {
   };
 }
 
-// 💾 Save report to server and Google Drive
+// ☁️ Save report directly to Google Drive
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
@@ -119,8 +117,6 @@ app.post("/save-report", async (req, res) => {
   }
 
   const filename = `${centerCode}_${batchName}.json`;
-  const filepath = path.join(reportsDir, filename);
-
   const reportData = {
     centerCode,
     batchName,
@@ -129,78 +125,29 @@ app.post("/save-report", async (req, res) => {
     uploadDate: new Date().toISOString(),
   };
 
-  fs.writeFile(filepath, JSON.stringify(reportData, null, 2), async (err) => {
-    if (err) {
-      console.error("❌ Failed to save report:", err);
-      return res.status(500).send("Failed to save report");
-    }
+  try {
+    const fileMetadata = {
+      name: filename,
+      parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
+    };
 
-    console.log("✅ Report saved locally:", filename);
+    const media = {
+      mimeType: "application/json",
+      body: Buffer.from(JSON.stringify(reportData, null, 2)),
+    };
 
-    try {
-      const fileMetadata = {
-        name: filename,
-        parents: ["1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"], // ✅ Your Google Drive folder ID
-      };
+    const driveRes = await driveService.files.create({
+      resource: fileMetadata,
+      media: media,
+      fields: "id",
+    });
 
-      const media = {
-        mimeType: "application/json",
-        body: fs.createReadStream(filepath),
-      };
-
-      const driveRes = await driveService.files.create({
-        resource: fileMetadata,
-        media: media,
-        fields: "id",
-      });
-
-      console.log("📤 Uploaded to Google Drive:", driveRes.data.id);
-      res.status(200).json({ message: "Report saved and uploaded to Drive", fileId: driveRes.data.id });
-    } catch (err) {
-      console.error("❌ Google Drive upload failed:", err.message);
-      res.status(500).send("Report saved locally, but Drive upload failed");
-    }
-  });
-});
-
-// 🔻 Get metadata for dropdowns
-app.get("/get-reports-metadata", (req, res) => {
-  fs.readdir(reportsDir, (err, files) => {
-    if (err) {
-      console.error("❌ Failed to read report directory:", err);
-      return res.status(500).send("Failed to read reports");
-    }
-
-    const metadata = files
-      .filter((file) => file.endsWith(".json"))
-      .map((file) => {
-        const [centerCode, batchName] = file.replace(".json", "").split("_");
-        return { centerCode, batchName };
-      });
-
-    res.json(metadata);
-  });
-});
-
-// 📄 Get specific report
-app.get("/get-report", (req, res) => {
-  const { center, batch } = req.query;
-
-  if (!center || !batch) {
-    return res.status(400).send("Missing center or batch");
+    console.log("📤 Uploaded to Google Drive:", driveRes.data.id);
+    res.status(200).json({ message: "Report uploaded to Drive", fileId: driveRes.data.id });
+  } catch (err) {
+    console.error("❌ Google Drive upload failed:", err.message);
+    res.status(500).send("Google Drive upload failed");
   }
-
-  const filename = `${center}_${batch}.json`;
-  const filepath = path.join(reportsDir, filename);
-
-  fs.readFile(filepath, "utf8", (err, data) => {
-    if (err) {
-      console.error("❌ Failed to read report:", err);
-      return res.status(404).send("Report not found");
-    }
-
-    res.json(JSON.parse(data));
-  });
 });
 
 // 🚀 Start server
