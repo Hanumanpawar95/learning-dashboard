@@ -24,9 +24,12 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 🔐 Google Auth setup (read credentials from env variable)
+// 🔐 Google Auth setup (from env, fix private_key line breaks)
+let credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON),
+  credentials,
   scopes: ["https://www.googleapis.com/auth/drive.file"],
 });
 const driveService = google.drive({ version: "v3", auth });
