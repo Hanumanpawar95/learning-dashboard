@@ -24,7 +24,7 @@ const eligibilityCriteria = {
   "BS-CSS": { classroomMin: 8, labMin: 36, sessionMin: 16, classroomMax: 20, labMax: 60, sessionMax: 20 },
 };
 
-// 🔐 Google Auth setup (fixing \n line breaks in private_key)
+// 🔐 Google Auth setup
 let credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
 credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
 
@@ -36,7 +36,33 @@ const auth = new google.auth.GoogleAuth({
 const driveService = google.drive({ version: "v3", auth });
 const folderId = "1mo1PJAOEkx_CC9tjACm439rosbk1GkIq"; // 📁 Your Drive folder ID
 
-// 🔍 Helper: Process each course row
+// 🔁 Retry Logic & Cache Utilities
+const cache = new Map();
+
+function setCache(key, data, ttl = 300000) {
+  cache.set(key, { data, expiry: Date.now() + ttl });
+}
+
+function getCache(key) {
+  const entry = cache.get(key);
+  if (entry && Date.now() < entry.expiry) return entry.data;
+  cache.delete(key);
+  return null;
+}
+
+async function retryGoogleDriveRequest(fn, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      console.warn(`⚠️ Retry ${i + 1} due to error:`, err.message);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+
+// 🔍 Process Course Logic
 function processCourse(row, course) {
   const extractMarks = (value, max) => {
     if (!value) return { actual: 0, max };
@@ -64,7 +90,7 @@ function processCourse(row, course) {
   };
 }
 
-// 📤 Endpoint: Upload and process CSV file
+// 📤 Upload & Process CSV
 app.post("/upload", upload.single("file"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
@@ -109,7 +135,7 @@ app.post("/upload", upload.single("file"), (req, res) => {
     });
 });
 
-// 📤 Endpoint: Save or update report on Google Drive
+// 📤 Save or Update Report
 app.post("/save-report", async (req, res) => {
   const { centerCode, batchName, uploadedBy, data } = req.body;
 
@@ -132,10 +158,12 @@ app.post("/save-report", async (req, res) => {
   const filename = `${centerCode}_${batchName}.json`;
 
   try {
-    const listRes = await driveService.files.list({
-      q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
-      fields: "files(id, name)",
-    });
+    const listRes = await retryGoogleDriveRequest(() =>
+      driveService.files.list({
+        q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
+        fields: "files(id, name)",
+      })
+    );
 
     if (listRes.data.files.length > 0) {
       const fileId = listRes.data.files[0].id;
@@ -172,13 +200,23 @@ app.post("/save-report", async (req, res) => {
   }
 });
 
-// 🆕 Endpoint: Fetch report metadata for dropdowns
+// 📥 Fetch Metadata (Optimized)
 app.get("/get-reports-metadata", async (req, res) => {
+  const cacheKey = "report_metadata";
+  const cached = getCache(cacheKey);
+
+  if (cached) {
+    console.log("⚡ Using cached metadata");
+    return res.json(cached);
+  }
+
   try {
-    const result = await driveService.files.list({
-      q: `'${folderId}' in parents and mimeType='application/json' and trashed = false`,
-      fields: "files(id, name)",
-    });
+    const result = await retryGoogleDriveRequest(() =>
+      driveService.files.list({
+        q: `'${folderId}' in parents and mimeType='application/json' and trashed = false`,
+        fields: "files(id, name)",
+      })
+    );
 
     const metadata = result.data.files.map(file => {
       const [centerCode, batchNameWithExt] = file.name.split("_");
@@ -186,14 +224,15 @@ app.get("/get-reports-metadata", async (req, res) => {
       return { centerCode, batchName };
     });
 
+    setCache(cacheKey, metadata, 5 * 60 * 1000); // Cache for 5 mins
     res.json(metadata);
   } catch (err) {
-    console.error("❌ Metadata fetch failed:", err.message);
+    console.error("❌ Metadata fetch failed after retries:", err.message);
     res.status(500).json({ error: "Failed to fetch metadata" });
   }
 });
 
-// 🆕 Endpoint: Fetch specific report by center & batch
+// 📥 Fetch Specific Report (Optimized)
 app.get("/get-report", async (req, res) => {
   const { center, batch } = req.query;
 
@@ -204,10 +243,12 @@ app.get("/get-report", async (req, res) => {
   const filename = `${center}_${batch}.json`;
 
   try {
-    const result = await driveService.files.list({
-      q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
-      fields: "files(id, name)",
-    });
+    const result = await retryGoogleDriveRequest(() =>
+      driveService.files.list({
+        q: `name='${filename}' and '${folderId}' in parents and trashed=false`,
+        fields: "files(id, name)",
+      })
+    );
 
     if (result.data.files.length === 0) {
       return res.status(404).json({ error: "Report not found" });
@@ -215,19 +256,21 @@ app.get("/get-report", async (req, res) => {
 
     const fileId = result.data.files[0].id;
 
-    const fileRes = await driveService.files.get({
-      fileId,
-      alt: "media",
-    });
+    const fileRes = await retryGoogleDriveRequest(() =>
+      driveService.files.get({
+        fileId,
+        alt: "media",
+      })
+    );
 
     res.json(fileRes.data);
   } catch (err) {
-    console.error("❌ Report fetch failed:", err.message);
+    console.error("❌ Report fetch failed after retries:", err.message);
     res.status(500).json({ error: "Failed to fetch report" });
   }
 });
 
-// 🚀 Start server
+// 🚀 Start Server
 app.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);
 });
