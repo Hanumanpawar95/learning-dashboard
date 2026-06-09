@@ -203,7 +203,6 @@ Eligible Learners
 `;
 });
 
-});
 
 dashboardHTML += `
 <div style="
@@ -221,7 +220,7 @@ text-align:center;
 <div style="
 font-size:32px;
 font-weight:bold;
-color:#2196f3;
+color:white;
 ">
 
 ${totalEligible}
