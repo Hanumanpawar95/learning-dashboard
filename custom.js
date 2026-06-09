@@ -99,148 +99,81 @@ document.addEventListener("DOMContentLoaded", () => {
             reportOutput.innerHTML = "<p>⚠️ No data found in this report.</p>";
             return;
           }
-		  const courses = Object.keys(data[0].courses || {});
+          const courses = Object.keys(data[0].courses || {});
 
-// Dashboard Calculation
-const eligibleCounts = {};
-const eligibleLearners = {};
+          // Dashboard Calculation
+          const eligibleCounts = {};
+          const eligibleLearners = {};
 
-courses.forEach(course => {
-  eligibleCounts[course] = 0;
-  eligibleLearners[course] = [];
-});
+          courses.forEach(course => {
+            eligibleCounts[course] = 0;
+            eligibleLearners[course] = [];
+          });
 
-let totalEligible = 0;
+          let totalEligible = 0;
 
-data.forEach(learner => {
+          data.forEach(learner => {
+            let anyEligible = false;
 
-  let anyEligible = false;
+            courses.forEach(course => {
+              const courseData = learner.courses[course];
 
-  courses.forEach(course => {
+              if (
+                courseData &&
+                courseData.eligible &&
+                (
+                  courseData.eligible === "✅ Eligible" ||
+                  courseData.eligible === "Eligible"
+                )
+              ) {
+                eligibleCounts[course]++;
 
-    const courseData = learner.courses[course];
+                eligibleLearners[course].push({
+                  code: learner.code,
+                  name: learner.name
+                });
 
-    if (
-	  courseData &&
-	  courseData.eligible &&
-	  (
-		courseData.eligible === "✅ Eligible" ||
-		courseData.eligible === "Eligible" ||
-		courseData.eligible.includes("✅")
-	  )
-	) {
+                anyEligible = true;
+              }
+            });
 
-      eligibleCounts[course]++;
+            if (anyEligible) {
+              totalEligible++;
+            }
+          });
 
-      eligibleLearners[course].push({
-        code: learner.code,
-        name: learner.name
-      });
+          window.eligibleLearners = eligibleLearners;
+          let dashboardHTML = `
+            <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin:20px 0;">
+          `;
 
-      anyEligible = true;
-    }
+          const cardColors = {
+            "BS-CIT": "linear-gradient(135deg,#0f8a3b,#2ecc71)",
+            "BS-CLS": "linear-gradient(135deg,#7b1fa2,#ab47bc)",
+            "BS-CSS": "linear-gradient(135deg,#c2185b,#ff4081)"
+          };
 
-  });
+          courses.forEach(course => {
+            const bg = cardColors[course] || "linear-gradient(135deg,#455a64,#78909c)";
 
-  if (anyEligible) {
-    totalEligible++;
-  }
+            dashboardHTML += `
+              <div onclick="window.showEligibleLearners('${course}')" style="cursor:pointer; background:${bg}; color:white; padding:20px; min-width:220px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.25); text-align:center;">
+                <h3 style="margin:0;">${course}</h3>
+                <div style="font-size:42px; font-weight:bold; margin-top:10px;">${eligibleCounts[course]}</div>
+                <div style="font-size:14px; opacity:.9;">Eligible Learners</div>
+              </div>
+            `;
+          });
 
-});
+          dashboardHTML += `
+            <div style="background:linear-gradient(135deg,#1565c0,#42a5f5); color:white; padding:20px; min-width:220px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.25); text-align:center;">
+              <h3 style="margin:0;">Total Eligible</h3>
+              <div style="font-size:42px; font-weight:bold; margin-top:10px;">${totalEligible}</div>
+              <div style="font-size:14px; opacity:.9;">Eligible In Any Course</div>
+            </div>
+          `;
 
-window.eligibleLearners = eligibleLearners;
-let dashboardHTML = `
-<div style="
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-justify-content:center;
-margin:20px 0;
-">
-`;
-
-const cardColors = {
-  "BS-CIT":"linear-gradient(135deg,#0f8a3b,#2ecc71)",
-  "BS-CLS":"linear-gradient(135deg,#7b1fa2,#ab47bc)",
-  "BS-CSS":"linear-gradient(135deg,#c2185b,#ff4081)"
-};
-
-courses.forEach(course => {
-
-const bg =
-cardColors[course] ||
-"linear-gradient(135deg,#455a64,#78909c)";
-
-dashboardHTML += `
-<div
-onclick="window.showEligibleLearners('${course}')"
-style="
-cursor:pointer;
-background:${bg};
-color:white;
-padding:20px;
-min-width:220px;
-border-radius:12px;
-box-shadow:0 4px 10px rgba(0,0,0,.25);
-text-align:center;
-">
-<h3 style="margin:0;">
-${course}
-</h3>
-
-<div style="
-font-size:42px;
-font-weight:bold;
-margin-top:10px;
-">
-${eligibleCounts[course]}
-</div>
-
-<div style="
-font-size:14px;
-opacity:.9;
-">
-Eligible Learners
-</div>
-
-</div>
-`;
-});
-
-dashboardHTML += `
-<div style="
-background:linear-gradient(135deg,#1565c0,#42a5f5);
-color:white;
-padding:20px;
-min-width:220px;
-border-radius:12px;
-box-shadow:0 4px 10px rgba(0,0,0,.25);
-text-align:center;
-">
-
-<h3 style="margin:0;">
-Total Eligible
-</h3>
-
-<div style="
-font-size:42px;
-font-weight:bold;
-margin-top:10px;
-">
-${totalEligible}
-</div>
-
-<div style="
-font-size:14px;
-opacity:.9;
-">
-Eligible In Any Course
-</div>
-
-</div>
-`;
-
-dashboardHTML += `</div>`;
+          dashboardHTML += `</div>`;
 
           // 🟢 Format Upload Date safely
           let uploadedDate = "Unknown";
@@ -274,8 +207,6 @@ dashboardHTML += `</div>`;
             <th>Learner Code</th>
             <th>Learner Name</th>
           `;
-
-		  
 
           courses.forEach(course => {
             headerRow.innerHTML += `
@@ -320,9 +251,7 @@ dashboardHTML += `</div>`;
             table.appendChild(row);
           });
 
-          reportOutput.innerHTML =
-          reportHeader + dashboardHTML;
-
+          reportOutput.innerHTML = reportHeader + dashboardHTML;
           reportOutput.appendChild(table);
         })
         .catch(err => {
@@ -333,65 +262,33 @@ dashboardHTML += `</div>`;
   };
 });
 
-window.showEligibleLearners = function(course){
+window.showEligibleLearners = function(course) {
+  const learners = window.eligibleLearners?.[course] || [];
+  const modal = document.getElementById("eligibleModal");
+  const title = document.getElementById("eligibleTitle");
+  const list = document.getElementById("eligibleList");
 
-const learners =
-window.eligibleLearners?.[course] || [];
+  if (!modal || !title || !list) {
+    console.log("Modal elements missing");
+    return;
+  }
 
-const modal =
-document.getElementById("eligibleModal");
+  title.innerHTML = `
+    <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">
+      ${course} Eligible Learners (${learners.length})
+    </div>
+  `;
 
-const title =
-document.getElementById("eligibleTitle");
+  list.innerHTML = learners.map((x, index) => `
+    <tr>
+      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">
+        ${x.code}
+      </td>
+      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">
+        ${x.name}
+      </td>
+    </tr>
+  `).join("");
 
-const list =
-document.getElementById("eligibleList");
-
-if (!modal || !title || !list) {
-  console.log("Modal elements missing");
-  return;
-}
-
-title.innerHTML = `
-<div style="
-background:linear-gradient(135deg,#4CAF50,#2E7D32);
-color:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-margin-bottom:10px;
-">
-${course} Eligible Learners (${learners.length})
-</div>
-`;
-
-list.innerHTML =
-learners.map((x,index) => `
-<tr>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-font-weight:bold;
-">
-${x.code}
-</td>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-text-align:left;
-">
-${x.name}
-</td>
-
-</tr>
-`).join("");
-
-modal.style.display = "block";
-
+  modal.style.display = "block";
 };
