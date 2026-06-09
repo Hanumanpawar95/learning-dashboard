@@ -330,28 +330,63 @@ dashboardHTML += `</div>`;
 });
 window.showEligibleLearners = function(course){
 
-console.log("Clicked:", course);
-
 const learners =
-window.eligibleLearners[course] || [];
+window.eligibleLearners?.[course] || [];
 
-document.getElementById(
-"eligibleTitle"
-).innerHTML =
-course + " Eligible Learners";
+const modal =
+document.getElementById("eligibleModal");
 
-document.getElementById(
-"eligibleList"
-).innerHTML =
-learners.map(x => `
-<li>
-<b>${x.code}</b> - ${x.name}
-</li>
+const title =
+document.getElementById("eligibleTitle");
+
+const list =
+document.getElementById("eligibleList");
+
+if (!modal || !title || !list) {
+  console.log("Modal elements missing");
+  return;
+}
+
+title.innerHTML = `
+<div style="
+background:linear-gradient(135deg,#4CAF50,#2E7D32);
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:10px;
+">
+${course} Eligible Learners (${learners.length})
+</div>
+`;
+
+list.innerHTML =
+learners.map((x,index) => `
+<tr>
+
+<td style="
+padding:10px;
+border:1px solid #ddd;
+background:${index % 2 ? '#f8f9fa' : '#ffffff'};
+font-weight:bold;
+">
+${x.code}
+</td>
+
+<td style="
+padding:10px;
+border:1px solid #ddd;
+background:${index % 2 ? '#f8f9fa' : '#ffffff'};
+text-align:left;
+">
+${x.name}
+</td>
+
+</tr>
 `).join("");
 
-document.getElementById(
-"eligibleModal"
-).style.display =
-"block";
+modal.style.display = "block";
 
 };

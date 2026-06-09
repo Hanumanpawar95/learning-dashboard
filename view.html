@@ -103,7 +103,8 @@ button:hover{
 <div id="reportOutput"></div>
 <!-- Eligible Learners Popup -->
 
-<div id="eligibleModal" style="
+<div id="eligibleModal"
+style="
 display:none;
 position:fixed;
 top:0;
@@ -114,28 +115,74 @@ background:rgba(0,0,0,.5);
 z-index:99999;
 ">
 
-<div style="
+<div
+style="
 background:white;
-width:600px;
+width:800px;
+max-width:95%;
 max-height:80vh;
 overflow:auto;
 margin:50px auto;
 padding:20px;
-border-radius:10px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
 ">
 
 <h2 id="eligibleTitle">
 Eligible Learners
 </h2>
 
-<ul id="eligibleList"></ul>
+<table
+style="
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+">
+
+<thead>
+
+<tr
+style="
+background:#4CAF50;
+color:white;
+">
+
+<th style="padding:10px;">
+🆔 Learner Code
+</th>
+
+<th style="padding:10px;">
+👤 Learner Name
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eligibleList">
+
+</tbody>
+
+</table>
 
 <div style="text-align:center;">
 
-<button onclick="
+<button
+onclick="
 document.getElementById('eligibleModal').style.display='none';
+"
+style="
+background:#f44336;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:6px;
+cursor:pointer;
+margin-top:15px;
 ">
-Close
+
+✖ Close
+
 </button>
 
 </div>
