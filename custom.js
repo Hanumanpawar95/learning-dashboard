@@ -119,11 +119,6 @@ data.forEach(learner => {
   courses.forEach(course => {
 
     const courseData = learner.courses[course];
-	  console.log(
-  learner.name,
-  course,
-  courseData?.eligible
-);
 
     if (
 	  courseData &&
@@ -177,7 +172,8 @@ cardColors[course] ||
 
 dashboardHTML += `
 <div
-onclick="window.showEligibleLearners('${course}')"
+data-course="${course}"
+class="eligible-card"
 style="
 cursor:pointer;
 background:${bg};
@@ -188,6 +184,30 @@ border-radius:12px;
 box-shadow:0 4px 10px rgba(0,0,0,.25);
 text-align:center;
 ">
+
+<h3 style="margin:0;">
+${course}
+</h3>
+
+<div style="
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+">
+${eligibleCounts[course]}
+</div>
+
+<div style="
+font-size:14px;
+opacity:.9;
+">
+Eligible Learners
+</div>
+
+</div>
+`;
+
+});
 <h3 style="margin:0;">
 ${course}
 </h3>
@@ -328,6 +348,18 @@ dashboardHTML += `</div>`;
           reportHeader + dashboardHTML;
 
           reportOutput.appendChild(table);
+		  document.querySelectorAll(".eligible-card").forEach(card => {
+
+  card.addEventListener("click", function () {
+
+    const course =
+    this.getAttribute("data-course");
+
+    window.showEligibleLearners(course);
+
+  });
+
+});
         })
         .catch(err => {
           console.error("❌ Error fetching report:", err);
@@ -351,47 +383,22 @@ const list =
 document.getElementById("eligibleList");
 
 if (!modal || !title || !list) {
-  console.log("Modal elements missing");
+  alert("Popup elements not found");
   return;
 }
 
-title.innerHTML = `
-<div style="
-background:linear-gradient(135deg,#4CAF50,#2E7D32);
-color:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-margin-bottom:10px;
-">
-${course} Eligible Learners (${learners.length})
-</div>
-`;
+title.innerHTML =
+`${course} Eligible Learners (${learners.length})`;
 
 list.innerHTML =
-learners.map((x,index) => `
+learners.map(x => `
 <tr>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-font-weight:bold;
-">
+<td style="padding:8px;border:1px solid #ddd;">
 ${x.code}
 </td>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-text-align:left;
-">
+<td style="padding:8px;border:1px solid #ddd;text-align:left;">
 ${x.name}
 </td>
-
 </tr>
 `).join("");
 
