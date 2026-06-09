@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reportOutput.innerHTML = "<p>⚠️ No data found in this report.</p>";
             return;
           }
-          const courses = Object.keys(data[0].courses || {});
+		  const courses = Object.keys(data[0].courses || {});
 
           // Dashboard Calculation
           const eligibleCounts = {};
@@ -126,7 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 anyEligible = true;
               }
             });
-            if (anyEligible) totalEligible++;
+            if (anyEligible) {
+              totalEligible++;
+            }
           });
 
           window.eligibleLearners = eligibleLearners;
@@ -161,14 +163,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
           dashboardHTML += `</div>`;
 
-          // Format Upload Date safely
+          // 🟢 Format Upload Date safely
           let uploadedDate = "Unknown";
           if (report.uploadDate) {
             const date = new Date(report.uploadDate);
             uploadedDate = isNaN(date.getTime()) ? report.uploadDate : date.toLocaleDateString("en-IN");
           }
 
-          // Report Header Info
+          // 🟡 Report Header Info
           const reportHeader = `
             <div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border: 1px solid #ccc;">
               <strong>Batch Name:</strong> ${report.batchName || batch}<br>
@@ -217,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
+// THIS FUNCTION MUST BE OUTSIDE THE DOMContentLoaded BLOCK
 window.showEligibleLearners = function(course) {
   const learners = window.eligibleLearners?.[course] || [];
   const modal = document.getElementById("eligibleModal");
