@@ -457,25 +457,31 @@ const list =
 document.getElementById("eligibleList");
 
 if (!modal || !title || !list) {
-
-alert(
-course + "\n\n" +
-learners.map(x =>
-`${x.code} - ${x.name}`
-).join("\n")
-);
-
-return;
+  return;
 }
 
 title.innerHTML =
-course + " Eligible Learners";
+`${course} Eligible Learners (${learners.length})`;
 
 list.innerHTML =
 learners.map(x => `
-<li>
-<b>${x.code}</b> - ${x.name}
-</li>
+<tr>
+<td style="
+padding:8px;
+border:1px solid #ddd;
+text-align:left;
+">
+${x.code}
+</td>
+
+<td style="
+padding:8px;
+border:1px solid #ddd;
+text-align:left;
+">
+${x.name}
+</td>
+</tr>
 `).join("");
 
 modal.style.display = "block";
