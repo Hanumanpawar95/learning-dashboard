@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Failed to load report metadata.");
     });
 
-  // Add Password Modal to the DOM (initially hidden)
+  // Inject Password Modal directly into the DOM (initially hidden)
   const modalHTML = `
     <div id="passwordModal" style="display: none;">
       <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
@@ -86,11 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       passwordModal.style.display = "none";
+      reportOutput.innerHTML = "<p>⌛ Fetching report from server...</p>";
+
+      // Securely encode query parameters to prevent 404 breaks caused by spaces/symbols
+      const cleanCenter = encodeURIComponent(center.trim());
+      const cleanBatch = encodeURIComponent(batch.trim());
 
       // Fetch the report
-      fetch(`https://learning-dashboard-zlb0.onrender.com/get-report?center=${center}&batch=${batch}`)
+      fetch(`https://learning-dashboard-zlb0.onrender.com/get-report?center=${cleanCenter}&batch=${cleanBatch}`)
         .then(res => {
-          if (!res.ok) throw new Error("Report not found");
+          if (!res.ok) throw new Error(`Report not found (Status ${res.status})`);
           return res.json();
         })
         .then(report => {
@@ -127,12 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
               ) {
                 eligibleCounts[course]++;
-
                 eligibleLearners[course].push({
                   code: learner.code,
                   name: learner.name
                 });
-
                 anyEligible = true;
               }
             });
@@ -144,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           window.eligibleLearners = eligibleLearners;
           let dashboardHTML = `
-            <div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin:20px 0;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin: 20px 0;">
           `;
 
           const cardColors = {
@@ -157,25 +160,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const bg = cardColors[course] || "linear-gradient(135deg,#455a64,#78909c)";
 
             dashboardHTML += `
-              <div onclick="window.showEligibleLearners('${course}')" style="cursor:pointer; background:${bg}; color:white; padding:20px; min-width:220px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.25); text-align:center;">
-                <h3 style="margin:0;">${course}</h3>
-                <div style="font-size:42px; font-weight:bold; margin-top:10px;">${eligibleCounts[course]}</div>
-                <div style="font-size:14px; opacity:.9;">Eligible Learners</div>
+              <div onclick="window.showEligibleLearners('${course}')" style="cursor: pointer; background: ${bg}; color: white; padding: 20px; min-width: 220px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.25); text-align: center;">
+                <h3 style="margin: 0;">${course}</h3>
+                <div style="font-size: 42px; font-weight: bold; margin-top: 10px;">${eligibleCounts[course]}</div>
+                <div style="font-size: 14px; opacity: .9;">Eligible Learners</div>
               </div>
             `;
           });
 
           dashboardHTML += `
-            <div style="background:linear-gradient(135deg,#1565c0,#42a5f5); color:white; padding:20px; min-width:220px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,.25); text-align:center;">
-              <h3 style="margin:0;">Total Eligible</h3>
-              <div style="font-size:42px; font-weight:bold; margin-top:10px;">${totalEligible}</div>
-              <div style="font-size:14px; opacity:.9;">Eligible In Any Course</div>
+            <div style="background: linear-gradient(135deg,#1565c0,#42a5f5); color: white; padding: 20px; min-width: 220px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.25); text-align: center;">
+              <h3 style="margin: 0;">Total Eligible</h3>
+              <div style="font-size: 42px; font-weight: bold; margin-top: 10px;">${totalEligible}</div>
+              <div style="font-size: 14px; opacity: .9;">Eligible In Any Course</div>
             </div>
-          `;
+          </div>`;
 
-          dashboardHTML += `</div>`;
-
-          // 🟢 Format Upload Date safely
+          // Format Upload Date safely
           let uploadedDate = "Unknown";
           if (report.uploadDate) {
             const date = new Date(report.uploadDate);
@@ -184,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
               : date.toLocaleDateString("en-IN");
           }
 
-          // 🟡 Report Header Info
+          // Report Header Info
           const reportHeader = `
             <div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border: 1px solid #ccc;">
               <strong>Batch Name:</strong> ${report.batchName || batch}<br>
@@ -256,35 +257,35 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(err => {
           console.error("❌ Error fetching report:", err);
-          reportOutput.innerHTML = "<p>❌ Failed to load report.</p>";
+          reportOutput.innerHTML = `<p style="color:red; font-weight:bold;">❌ Failed to load report. Verification failed or file named incorrectly on Drive.</p>`;
         });
     };
   };
 });
 
-window.showEligibleLearners = function(course) {
+window.showEligibleLearners = function (course) {
   const learners = window.eligibleLearners?.[course] || [];
   const modal = document.getElementById("eligibleModal");
   const title = document.getElementById("eligibleTitle");
   const list = document.getElementById("eligibleList");
 
   if (!modal || !title || !list) {
-    console.log("Modal elements missing");
+    console.log("Modal elements missing on this template");
     return;
   }
 
   title.innerHTML = `
-    <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">
+    <div style="background: linear-gradient(135deg,#4CAF50,#2E7D32); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 10px;">
       ${course} Eligible Learners (${learners.length})
     </div>
   `;
 
   list.innerHTML = learners.map((x, index) => `
     <tr>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">
+      <td style="padding: 10px; border: 1px solid #ddd; background: ${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight: bold;">
         ${x.code}
       </td>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">
+      <td style="padding: 10px; border: 1px solid #ddd; background: ${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align: left;">
         ${x.name}
       </td>
     </tr>
