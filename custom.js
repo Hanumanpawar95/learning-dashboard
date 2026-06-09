@@ -121,10 +121,13 @@ data.forEach(learner => {
     const courseData = learner.courses[course];
 
     if (
-      courseData &&
-      courseData.eligible &&
-      courseData.eligible.includes("✅")
-    ) {
+  courseData &&
+  courseData.eligible &&
+  (
+    courseData.eligible.includes("✅") ||
+    courseData.eligible.includes("Eligible")
+  )
+) {
 
       eligibleCounts[course]++;
 
@@ -145,6 +148,7 @@ data.forEach(learner => {
 });
 
 window.eligibleLearners = eligibleLearners;
+console.log("eligibleLearners =", eligibleLearners);
 let dashboardHTML = `
 <div style="
 display:flex;
@@ -169,7 +173,7 @@ cardColors[course] ||
 
 dashboardHTML += `
 <div
-onclick="showEligibleLearners('${course}')"
+onclick="window.showEligibleLearners('${course}')"
 style="
 cursor:pointer;
 background:${bg};
