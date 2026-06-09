@@ -77,6 +77,51 @@ document.addEventListener("DOMContentLoaded", function () {
     // Headers
     tableHeaderRow.innerHTML = `<th>#</th><th>Learner Code</th><th>Learner Name</th>`;
     const courseNames = Object.keys(reportData[0].courses || {});
+	// Dashboard Calculation
+const eligibleCounts = {};
+const eligibleLearners = {};
+
+courseNames.forEach(course => {
+  eligibleCounts[course] = 0;
+  eligibleLearners[course] = [];
+});
+
+let totalEligible = 0;
+
+reportData.forEach(learner => {
+
+  let anyEligible = false;
+
+  courseNames.forEach(course => {
+
+    const courseData = learner.courses[course];
+
+    if (
+  courseData &&
+  courseData.eligible &&
+  courseData.eligible.includes("✅")
+   ){
+
+      eligibleCounts[course]++;
+
+      eligibleLearners[course].push({
+        code: learner.code,
+        name: learner.name
+      });
+
+      anyEligible = true;
+    }
+  });
+
+  if (anyEligible) {
+    totalEligible++;
+  }
+
+});
+
+window.eligibleLearners = eligibleLearners;
+console.log("Eligible Counts:", eligibleCounts);
+console.log("Total Eligible:", totalEligible);
     courseNames.forEach((course) => {
       tableHeaderRow.innerHTML += `
         <th>${course} Classroom</th>
@@ -87,6 +132,91 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     tableHeaderRow.innerHTML += `<th>Overall Status</th><th>Comment</th>`;
     tableBody.innerHTML = "";
+
+// Dashboard HTML
+const dashboard =
+document.getElementById("eligibilityDashboard");
+
+if (dashboard) {
+
+let dashboardHTML = `
+<div style="
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+justify-content:center;
+margin:20px 0;
+">
+`;
+
+courseNames.forEach(course => {
+
+dashboardHTML += `
+<div
+onclick="showEligibleLearners('${course}')"
+style="
+cursor:pointer;
+background:white;
+padding:15px;
+min-width:180px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+border-left:5px solid #28a745;
+text-align:center;
+">
+
+<h3>${course}</h3>
+
+<div style="
+font-size:32px;
+font-weight:bold;
+color:#28a745;
+">
+
+${eligibleCounts[course]}
+
+</div>
+
+<div>Eligible Learners</div>
+
+</div>
+`;
+
+});
+
+dashboardHTML += `
+<div style="
+background:white;
+padding:15px;
+min-width:180px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,.15);
+border-left:5px solid #2196f3;
+text-align:center;
+">
+
+<h3>Total Eligible</h3>
+
+<div style="
+font-size:32px;
+font-weight:bold;
+color:#2196f3;
+">
+
+${totalEligible}
+
+</div>
+
+</div>
+`;
+
+dashboardHTML += "</div>";
+
+dashboard.innerHTML = dashboardHTML;
+
+console.log("Dashboard Created");
+console.log(dashboardHTML);
+}
 
     reportData.forEach((learner, index) => {
       const row = document.createElement("tr");
@@ -266,7 +396,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     pdf.save("Batch_Report.pdf");
   }
+window.showEligibleLearners = function(course){
 
+const learners =
+window.eligibleLearners[course] || [];
+
+document.getElementById(
+"eligibleTitle"
+).innerHTML =
+course + " Eligible Learners";
+
+document.getElementById(
+"eligibleList"
+).innerHTML =
+learners.map(x => `
+<li>
+<b>${x.code}</b> -
+${x.name}
+</li>
+`).join("");
+
+document.getElementById(
+"eligibleModal"
+).style.display = "block";
+
+};
   // Init report.html
   if (window.location.pathname.includes("report.html")) {
     generateReport();
