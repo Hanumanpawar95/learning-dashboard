@@ -442,7 +442,7 @@ console.log(dashboardHTML);
 
     pdf.save("Batch_Report.pdf");
   }
- window.showEligibleLearners = function(course){
+window.showEligibleLearners = function(course){
 
 const learners =
 window.eligibleLearners?.[course] || [];
