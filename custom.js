@@ -169,6 +169,7 @@ cardColors[course] ||
 
 dashboardHTML += `
 <div
+onclick="showEligibleLearners('${course}')"
 style="
 cursor:pointer;
 background:${bg};
@@ -179,7 +180,6 @@ border-radius:12px;
 box-shadow:0 4px 10px rgba(0,0,0,.25);
 text-align:center;
 ">
-
 <h3 style="margin:0;">
 ${course}
 </h3>
@@ -328,3 +328,28 @@ dashboardHTML += `</div>`;
     };
   };
 });
+window.showEligibleLearners = function(course){
+
+const learners =
+window.eligibleLearners[course] || [];
+
+document.getElementById(
+"eligibleTitle"
+).innerHTML =
+course + " Eligible Learners";
+
+document.getElementById(
+"eligibleList"
+).innerHTML =
+learners.map(x => `
+<li>
+<b>${x.code}</b> - ${x.name}
+</li>
+`).join("");
+
+document.getElementById(
+"eligibleModal"
+).style.display =
+"block";
+
+};
