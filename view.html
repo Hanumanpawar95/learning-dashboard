@@ -1,50 +1,108 @@
-<!-- view.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>View Uploaded Reports</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      text-align: center;
-      background-color: #f7f7f7;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Uploaded Reports</title>
 
-    select, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-    }
+<style>
 
-    button {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+body{
+  font-family: Arial, sans-serif;
+  padding: 30px;
+  background: #f7f7f7;
+  text-align: center;
+}
 
-    button:hover {
-      background-color: #388e3c;
-    }
-  </style>
+h2{
+  color: #333;
+  margin-bottom: 20px;
+}
+
+select,
+button{
+  padding: 10px 15px;
+  font-size: 16px;
+  margin: 10px;
+  border-radius: 6px;
+}
+
+select{
+  min-width: 250px;
+}
+
+button{
+  background: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover{
+  background: #388e3c;
+}
+
+#reportOutput{
+  margin-top: 25px;
+  text-align: left;
+  overflow-x: auto;
+}
+
+#reportOutput table{
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-top: 15px;
+}
+
+#reportOutput th{
+  background: #4caf50;
+  color: white;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+#reportOutput td{
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+</style>
+
 </head>
+
 <body>
-  <h2>🔎 View Uploaded Batch Reports</h2>
 
-  <label for="centerCodeSelect">Select Center Code:</label><br>
-  <select id="centerCodeSelect">
-    <option value="">Loading...</option>
-  </select><br><br>
+<h2>🔎 View Uploaded Batch Reports</h2>
 
-  <label for="batchNameSelect">Select Batch Name:</label><br>
-  <select id="batchNameSelect">
-    <option value="">Please select center first</option>
-  </select><br><br>
+<label>Select Center Code:</label>
+<br>
 
-  <button id="viewReportBtn">📄 View Report</button>
+<select id="viewCenterDropdown">
+  <option value="">Loading...</option>
+</select>
 
-  <script src="script.js"></script>
+<br><br>
+
+<label>Select Batch Name:</label>
+<br>
+
+<select id="viewBatchDropdown">
+  <option value="">Please select center first</option>
+</select>
+
+<br><br>
+
+<button onclick="viewReport()">
+  📄 View Report
+</button>
+
+<hr style="margin:25px 0;">
+
+<div id="reportOutput"></div>
+
+<script src="custom.js"></script>
+
 </body>
 </html>
