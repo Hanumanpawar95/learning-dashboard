@@ -518,3 +518,33 @@ modal.style.display = "block";
     });
   }
 });
+// This function dynamically handles the click for any course name passed to it
+window.showEligibleLearners = function(course) {
+  // Use the course parameter to look up the correct list
+  const learners = window.eligibleLearners?.[course] || [];
+  const modal = document.getElementById("eligibleModal");
+  const title = document.getElementById("eligibleTitle");
+  const list = document.getElementById("eligibleList");
+
+  if (!modal || !title || !list) {
+    console.log("Modal elements not found!");
+    return;
+  }
+
+  // Update title dynamically based on the course clicked
+  title.innerHTML = `
+    <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">
+      ${course} Eligible Learners (${learners.length})
+    </div>
+  `;
+
+  // Populate list dynamically
+  list.innerHTML = learners.map((x, index) => `
+    <tr>
+      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
+      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+    </tr>
+  `).join("");
+
+  modal.style.display = "block";
+};
