@@ -263,33 +263,39 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-window.showEligibleLearners = function (course) {
-  const learners = window.eligibleLearners?.[course] || [];
-  const modal = document.getElementById("eligibleModal");
-  const title = document.getElementById("eligibleTitle");
-  const list = document.getElementById("eligibleList");
+// Ensure this is outside of the DOMContentLoaded block
+window.showEligibleLearners = function(course) {
+    console.log("Attempting to show learners for:", course); // Check console for this!
+    
+    // 1. Get the data from the global object we created during the fetch
+    const learners = window.eligibleLearners ? window.eligibleLearners[course] : null;
 
-  if (!modal || !title || !list) {
-    console.log("Modal elements missing on this template");
-    return;
-  }
+    if (!learners) {
+        console.error("No data found for course:", course);
+        alert("Data not found for this course.");
+        return;
+    }
 
-  title.innerHTML = `
-    <div style="background: linear-gradient(135deg,#4CAF50,#2E7D32); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 10px;">
-      ${course} Eligible Learners (${learners.length})
-    </div>
-  `;
+    // 2. Target the modal elements
+    const modal = document.getElementById("eligibleModal");
+    const title = document.getElementById("eligibleTitle");
+    const list = document.getElementById("eligibleList");
 
-  list.innerHTML = learners.map((x, index) => `
-    <tr>
-      <td style="padding: 10px; border: 1px solid #ddd; background: ${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight: bold;">
-        ${x.code}
-      </td>
-      <td style="padding: 10px; border: 1px solid #ddd; background: ${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align: left;">
-        ${x.name}
-      </td>
-    </tr>
-  `).join("");
+    if (!modal || !title || !list) {
+        console.error("Modal elements not found in DOM!");
+        return;
+    }
 
-  modal.style.display = "block";
+    // 3. Populate the title and list
+    title.innerHTML = `<h3>${course} Eligible Learners (${learners.length})</h3>`;
+    
+    list.innerHTML = learners.map((x, index) => `
+        <tr>
+            <td style="padding:10px; border:1px solid #ddd;">${x.code}</td>
+            <td style="padding:10px; border:1px solid #ddd;">${x.name}</td>
+        </tr>
+    `).join("");
+
+    // 4. Show the modal
+    modal.style.display = "block";
 };
