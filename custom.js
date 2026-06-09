@@ -330,6 +330,8 @@ dashboardHTML += `</div>`;
 });
 window.showEligibleLearners = function(course){
 
+console.log("Clicked:", course);
+
 const learners =
 window.eligibleLearners[course] || [];
 
