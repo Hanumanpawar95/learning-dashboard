@@ -176,7 +176,11 @@ text-align:center;
 transition:.3s;
 ">
 
-<h3 style="margin:0;">
+<h3 style="
+margin:0;
+font-size:22px;
+font-weight:bold;
+">
 ${course}
 </h3>
 
@@ -201,11 +205,14 @@ Eligible Learners
 
 </div>
 `;
+
 });
 
+// Total Eligible Card
 
 dashboardHTML += `
-<div style="
+<div
+style="
 background:linear-gradient(135deg,#1565c0,#42a5f5);
 color:white;
 padding:20px;
@@ -215,11 +222,18 @@ box-shadow:0 4px 10px rgba(0,0,0,.25);
 text-align:center;
 ">
 
-<h3>Total Eligible</h3>
+<h3 style="
+margin:0;
+font-size:22px;
+font-weight:bold;
+">
+Total Eligible
+</h3>
 
 <div style="
-font-size:32px;
+font-size:42px;
 font-weight:bold;
+margin-top:10px;
 color:white;
 ">
 
@@ -227,15 +241,27 @@ ${totalEligible}
 
 </div>
 
+<div style="
+font-size:14px;
+opacity:.9;
+">
+
+Eligible In Any Course
+
+</div>
+
 </div>
 `;
 
-dashboardHTML += "</div>";
+dashboardHTML += `
+</div>
+`;
 
 dashboard.innerHTML = dashboardHTML;
 
 console.log("Dashboard Created");
 console.log(dashboardHTML);
+
 }
 
     reportData.forEach((learner, index) => {
