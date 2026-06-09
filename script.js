@@ -411,7 +411,6 @@ console.log(dashboardHTML);
           },
         });
       });
-
       body.push(rowData);
     });
 
@@ -419,91 +418,34 @@ console.log(dashboardHTML);
       startY: 38,
       head: [headers],
       body,
-      styles: {
-        font: "helvetica",
-        fontSize: 8.5,
-        cellPadding: 2,
-        lineColor: [0, 0, 0],
-        lineWidth: 0.1,
-      },
-      headStyles: {
-        fillColor: [0, 150, 136],
-        textColor: [255, 255, 255],
-        fontSize: 9,
-      },
-      columnStyles: {
-        0: { cellWidth: 10 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 30 },
-        [headers.length - 1]: { cellWidth: 50 },
-      },
+      styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+      headStyles: { fillColor: [0, 150, 136], textColor: [255, 255, 255], fontSize: 9 },
+      columnStyles: { 0: { cellWidth: 10 }, 1: { cellWidth: 40 }, 2: { cellWidth: 30 }, [headers.length - 1]: { cellWidth: 50 } },
       theme: "grid",
     });
-
     pdf.save("Batch_Report.pdf");
   }
-window.showEligibleLearners = function(course){
 
-const learners =
-window.eligibleLearners?.[course] || [];
+  // ग्लोबल फंक्शन - इसे DOMContentLoaded के बाहर रखें
+  window.showEligibleLearners = function(course) {
+    const learners = window.eligibleLearners?.[course] || [];
+    const modal = document.getElementById("eligibleModal");
+    const title = document.getElementById("eligibleTitle");
+    const list = document.getElementById("eligibleList");
 
-const modal =
-document.getElementById("eligibleModal");
+    if (!modal || !title || !list) return;
 
-const title =
-document.getElementById("eligibleTitle");
+    title.innerHTML = `<div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">${course} Eligible Learners (${learners.length})</div>`;
+    list.innerHTML = learners.map((x, index) => `
+      <tr>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
+        <td style="padding:1px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+      </tr>
+    `).join("");
+    modal.style.display = "block";
+  };
 
-const list =
-document.getElementById("eligibleList");
-
-if (!modal || !title || !list) {
-  return;
-}
-
-title.innerHTML = `
-<div style="
-background:linear-gradient(135deg,#4CAF50,#2E7D32);
-color:white;
-padding:15px;
-border-radius:10px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-margin-bottom:10px;
-">
-${course} Eligible Learners (${learners.length})
-</div>
-`;
-
-list.innerHTML =
-learners.map((x,index) => `
-<tr>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-font-weight:bold;
-">
-${x.code}
-</td>
-
-<td style="
-padding:10px;
-border:1px solid #ddd;
-background:${index % 2 ? '#f8f9fa' : '#ffffff'};
-text-align:left;
-">
-${x.name}
-</td>
-
-</tr>
-`).join("");
-
-modal.style.display = "block";
-
-};
-  // Init report.html
+  // Init report.html (यह DOMContentLoaded के अंदर का हिस्सा है)
   if (window.location.pathname.includes("report.html")) {
     generateReport();
     const pdfBtn = document.getElementById("downloadPDF");
@@ -518,33 +460,3 @@ modal.style.display = "block";
     });
   }
 });
-// This function dynamically handles the click for any course name passed to it
-window.showEligibleLearners = function(course) {
-  // Use the course parameter to look up the correct list
-  const learners = window.eligibleLearners?.[course] || [];
-  const modal = document.getElementById("eligibleModal");
-  const title = document.getElementById("eligibleTitle");
-  const list = document.getElementById("eligibleList");
-
-  if (!modal || !title || !list) {
-    console.log("Modal elements not found!");
-    return;
-  }
-
-  // Update title dynamically based on the course clicked
-  title.innerHTML = `
-    <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">
-      ${course} Eligible Learners (${learners.length})
-    </div>
-  `;
-
-  // Populate list dynamically
-  list.innerHTML = learners.map((x, index) => `
-    <tr>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
-    </tr>
-  `).join("");
-
-  modal.style.display = "block";
-};
