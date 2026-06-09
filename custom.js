@@ -99,6 +99,144 @@ document.addEventListener("DOMContentLoaded", () => {
             reportOutput.innerHTML = "<p>⚠️ No data found in this report.</p>";
             return;
           }
+		  const courses = Object.keys(data[0].courses || {});
+
+// Dashboard Calculation
+const eligibleCounts = {};
+const eligibleLearners = {};
+
+courses.forEach(course => {
+  eligibleCounts[course] = 0;
+  eligibleLearners[course] = [];
+});
+
+let totalEligible = 0;
+
+data.forEach(learner => {
+
+  let anyEligible = false;
+
+  courses.forEach(course => {
+
+    const courseData = learner.courses[course];
+
+    if (
+      courseData &&
+      courseData.eligible &&
+      courseData.eligible.includes("✅")
+    ) {
+
+      eligibleCounts[course]++;
+
+      eligibleLearners[course].push({
+        code: learner.code,
+        name: learner.name
+      });
+
+      anyEligible = true;
+    }
+
+  });
+
+  if (anyEligible) {
+    totalEligible++;
+  }
+
+});
+
+window.eligibleLearners = eligibleLearners;
+let dashboardHTML = `
+<div style="
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+justify-content:center;
+margin:20px 0;
+">
+`;
+
+const cardColors = {
+  "BS-CIT":"linear-gradient(135deg,#0f8a3b,#2ecc71)",
+  "BS-CLS":"linear-gradient(135deg,#7b1fa2,#ab47bc)",
+  "BS-CSS":"linear-gradient(135deg,#c2185b,#ff4081)"
+};
+
+courses.forEach(course => {
+
+const bg =
+cardColors[course] ||
+"linear-gradient(135deg,#455a64,#78909c)";
+
+dashboardHTML += `
+<div
+style="
+cursor:pointer;
+background:${bg};
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
+text-align:center;
+">
+
+<h3 style="margin:0;">
+${course}
+</h3>
+
+<div style="
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+">
+${eligibleCounts[course]}
+</div>
+
+<div style="
+font-size:14px;
+opacity:.9;
+">
+Eligible Learners
+</div>
+
+</div>
+`;
+});
+
+dashboardHTML += `
+<div style="
+background:linear-gradient(135deg,#1565c0,#42a5f5);
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
+text-align:center;
+">
+
+<h3 style="margin:0;">
+Total Eligible
+</h3>
+
+<div style="
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+">
+${totalEligible}
+</div>
+
+<div style="
+font-size:14px;
+opacity:.9;
+">
+Eligible In Any Course
+</div>
+
+</div>
+`;
+
+dashboardHTML += `</div>`;
 
           // 🟢 Format Upload Date safely
           let uploadedDate = "Unknown";
@@ -133,8 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <th>Learner Name</th>
           `;
 
-          const firstLearner = data[0];
-          const courses = Object.keys(firstLearner.courses);
+		  
 
           courses.forEach(course => {
             headerRow.innerHTML += `
@@ -179,7 +316,9 @@ document.addEventListener("DOMContentLoaded", () => {
             table.appendChild(row);
           });
 
-          reportOutput.innerHTML = reportHeader;
+          reportOutput.innerHTML =
+          reportHeader + dashboardHTML;
+
           reportOutput.appendChild(table);
         })
         .catch(err => {
