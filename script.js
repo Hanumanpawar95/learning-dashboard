@@ -460,27 +460,43 @@ if (!modal || !title || !list) {
   return;
 }
 
-title.innerHTML =
-`${course} Eligible Learners (${learners.length})`;
+title.innerHTML = `
+<div style="
+background:linear-gradient(135deg,#4CAF50,#2E7D32);
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:10px;
+">
+${course} Eligible Learners (${learners.length})
+</div>
+`;
 
 list.innerHTML =
-learners.map(x => `
+learners.map((x,index) => `
 <tr>
+
 <td style="
-padding:8px;
+padding:10px;
 border:1px solid #ddd;
-text-align:left;
+background:${index % 2 ? '#f8f9fa' : '#ffffff'};
+font-weight:bold;
 ">
 ${x.code}
 </td>
 
 <td style="
-padding:8px;
+padding:10px;
 border:1px solid #ddd;
+background:${index % 2 ? '#f8f9fa' : '#ffffff'};
 text-align:left;
 ">
 ${x.name}
 </td>
+
 </tr>
 `).join("");
 
