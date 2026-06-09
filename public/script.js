@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const tableBody = document.getElementById("table-body");
   const tableHeaderRow = document.getElementById("table-header-row");
 
-  // Upload page logic
+  // Handle Upload Page
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const formData = new FormData();
       formData.append("file", fileInput.files[0]);
 
-      fetch("http://localhost:5000/upload", {
+      fetch("https://learning-dashboard-zlb0.onrender.com/upload", {
         method: "POST",
         body: formData,
       })
@@ -55,10 +55,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Report generation logic
+  // Generate Report Logic
   function generateReport() {
-    console.log("✅ Generating report...");
-
     const centerCode = sessionStorage.getItem("centerCode");
     const batchName = sessionStorage.getItem("batchName");
     const uploadedBy = sessionStorage.getItem("uploadedBy");
@@ -76,10 +74,55 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("uploadedBy").textContent = uploadedBy;
     document.getElementById("uploadDate").textContent = uploadDate;
 
-    // Table Headers
+    // Headers
     tableHeaderRow.innerHTML = `<th>#</th><th>Learner Code</th><th>Learner Name</th>`;
     const courseNames = Object.keys(reportData[0].courses || {});
-    courseNames.forEach(course => {
+	// Dashboard Calculation
+const eligibleCounts = {};
+const eligibleLearners = {};
+
+courseNames.forEach(course => {
+  eligibleCounts[course] = 0;
+  eligibleLearners[course] = [];
+});
+
+let totalEligible = 0;
+
+reportData.forEach(learner => {
+
+  let anyEligible = false;
+
+  courseNames.forEach(course => {
+
+    const courseData = learner.courses[course];
+
+    if (
+  courseData &&
+  courseData.eligible &&
+  courseData.eligible.includes("✅")
+   ){
+
+      eligibleCounts[course]++;
+
+      eligibleLearners[course].push({
+        code: learner.code,
+        name: learner.name
+      });
+
+      anyEligible = true;
+    }
+  });
+
+  if (anyEligible) {
+    totalEligible++;
+  }
+
+});
+
+window.eligibleLearners = eligibleLearners;
+console.log("Eligible Counts:", eligibleCounts);
+console.log("Total Eligible:", totalEligible);
+    courseNames.forEach((course) => {
       tableHeaderRow.innerHTML += `
         <th>${course} Classroom</th>
         <th>${course} Lab</th>
@@ -89,6 +132,137 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     tableHeaderRow.innerHTML += `<th>Overall Status</th><th>Comment</th>`;
     tableBody.innerHTML = "";
+
+// Dashboard HTML
+const dashboard =
+document.getElementById("eligibilityDashboard");
+
+if (dashboard) {
+
+let dashboardHTML = `
+<div style="
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+justify-content:center;
+margin:20px 0;
+">
+`;
+
+const cardColors = {
+  "BS-CIT":"linear-gradient(135deg,#0f8a3b,#2ecc71)",
+  "BS-CLS":"linear-gradient(135deg,#7b1fa2,#ab47bc)",
+  "BS-CSS":"linear-gradient(135deg,#c2185b,#ff4081)"
+};
+
+courseNames.forEach(course => {
+
+const bg =
+cardColors[course] ||
+"linear-gradient(135deg,#455a64,#78909c)";
+
+dashboardHTML += `
+<div
+onclick="showEligibleLearners('${course}')"
+style="
+cursor:pointer;
+background:${bg};
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
+text-align:center;
+transition:.3s;
+">
+
+<h3 style="
+margin:0;
+font-size:22px;
+font-weight:bold;
+">
+${course}
+</h3>
+
+<div style="
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+">
+
+${eligibleCounts[course]}
+
+</div>
+
+<div style="
+font-size:14px;
+opacity:.9;
+">
+
+Eligible Learners
+
+</div>
+
+</div>
+`;
+
+});
+
+// Total Eligible Card
+
+dashboardHTML += `
+<div
+style="
+background:linear-gradient(135deg,#1565c0,#42a5f5);
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
+text-align:center;
+">
+
+<h3 style="
+margin:0;
+font-size:22px;
+font-weight:bold;
+">
+Total Eligible
+</h3>
+
+<div style="
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+color:white;
+">
+
+${totalEligible}
+
+</div>
+
+<div style="
+font-size:14px;
+opacity:.9;
+">
+
+Eligible In Any Course
+
+</div>
+
+</div>
+`;
+
+dashboardHTML += `
+</div>
+`;
+
+dashboard.innerHTML = dashboardHTML;
+
+console.log("Dashboard Created");
+console.log(dashboardHTML);
+
+}
 
     reportData.forEach((learner, index) => {
       const row = document.createElement("tr");
@@ -100,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       let isEligibleForAnyCourse = false;
 
-      courseNames.forEach(course => {
+      courseNames.forEach((course) => {
         const courseData = learner.courses[course];
         const classroomMarks = courseData.classroomMarks ?? "";
         const labMarks = courseData.labMarks ?? "";
@@ -127,9 +301,6 @@ document.addEventListener("DOMContentLoaded", function () {
       tableBody.appendChild(row);
     });
 
-    // Add Submit Report Button
-    console.log("✅ Appending submit button...");
-
     const btnContainer = document.getElementById("button-container");
     if (btnContainer) {
       const submitBtn = document.createElement("button");
@@ -137,12 +308,10 @@ document.addEventListener("DOMContentLoaded", function () {
       submitBtn.className = "submit-report-btn";
       submitBtn.addEventListener("click", submitFinalReport);
       btnContainer.appendChild(submitBtn);
-    } else {
-      console.error("❌ 'button-container' not found in DOM.");
     }
   }
 
-  // Save Report to Server
+  // Submit Final Report
   function submitFinalReport() {
     console.log("📝 Submit report clicked!");
 
@@ -161,23 +330,27 @@ document.addEventListener("DOMContentLoaded", function () {
       data: reportData,
     };
 
-    fetch("http://localhost:5000/save-report", {
+    fetch("https://learning-dashboard-zlb0.onrender.com/save-report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     })
-      .then((res) => res.json())
-      .then((response) => {
-        alert("✅ Report submitted successfully.");
-        console.log(response);
-      })
+      .then(async (res) => {
+  const data = await res.json();
+  if (res.ok) {
+    alert("✅ " + data.message + "\n📄 File ID: " + data.fileId);
+    sessionStorage.clear();
+  } else {
+    alert("❌ Server error: " + (data.message || "Unknown error"));
+  }
+})
       .catch((err) => {
         console.error("❌ Error saving report:", err);
         alert("❌ Failed to save report.");
       });
   }
 
-  // PDF Download Function
+  // PDF Download
   function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const centerCode = sessionStorage.getItem("centerCode");
@@ -185,22 +358,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const uploadedBy = document.getElementById("uploadedBy").textContent;
     const uploadDate = document.getElementById("uploadDate").textContent;
 
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: [380, 210],
-    });
-
+    const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: [380, 210] });
     pdf.setFillColor(244, 246, 249);
     pdf.rect(0, 0, 380, 210, "F");
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(14);
-    pdf.setTextColor(33, 33, 33);
+    pdf.setFont("helvetica", "bold").setFontSize(14).setTextColor(33, 33, 33);
     pdf.text(batchName, 14, 15);
 
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "normal").setFontSize(11);
     pdf.text(`Center Code: ${centerCode}`, 14, 21);
     pdf.text(`Uploaded By: ${uploadedBy}`, 14, 27);
     pdf.text(`Date: ${uploadDate}`, 14, 33);
@@ -209,35 +374,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const headers = [];
     const body = [];
 
-    const headerCells = table.querySelectorAll("thead tr th");
-    headerCells.forEach(th => headers.push(th.textContent.trim()));
-
-    const rows = table.querySelectorAll("tbody tr");
-    rows.forEach(row => {
+    table.querySelectorAll("thead tr th").forEach((th) => headers.push(th.textContent.trim()));
+    table.querySelectorAll("tbody tr").forEach((row) => {
       const rowData = [];
       const cells = row.querySelectorAll("td");
 
       cells.forEach((td, i) => {
         let text = "";
-
         if (i === cells.length - 1) {
           const textarea = td.querySelector("textarea");
           text = textarea ? textarea.value.trim() : "";
         } else {
           text = td.textContent.trim();
-
-          const isStatusColumn = headers[i]?.toLowerCase().includes("status");
-          if (isStatusColumn) {
+          const isStatus = headers[i]?.toLowerCase().includes("status");
+          if (isStatus) {
             const raw = text.toLowerCase();
-            if (raw.includes("✔") || raw.includes("✓")) {
-              text = "Eligible";
-            } else if (raw.includes("✘") || raw.includes("✗") || raw.includes("not eligible")) {
-              text = "Not Eligible";
-            } else {
-              if (raw.includes("eligible") && !raw.includes("not")) {
-                text = "Eligible";
-              }
-            }
+            if (raw.includes("✔") || raw.includes("✓")) text = "Eligible";
+            else if (raw.includes("✘") || raw.includes("✗") || raw.includes("not eligible")) text = "Not Eligible";
           }
         }
 
@@ -258,47 +411,48 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         });
       });
-
       body.push(rowData);
     });
 
     pdf.autoTable({
       startY: 38,
       head: [headers],
-      body: body,
-      styles: {
-        font: "helvetica",
-        fontSize: 8.5,
-        cellPadding: 2,
-        overflow: "linebreak",
-        lineColor: [0, 0, 0],
-        lineWidth: 0.1,
-      },
-      headStyles: {
-        fillColor: [0, 150, 136],
-        textColor: [255, 255, 255],
-        fontSize: 9,
-      },
-      columnStyles: {
-        0: { cellWidth: 10 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 30 },
-        [headers.length - 1]: { cellWidth: 50 },
-      },
+      body,
+      styles: { font: "helvetica", fontSize: 8.5, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+      headStyles: { fillColor: [0, 150, 136], textColor: [255, 255, 255], fontSize: 9 },
+      columnStyles: { 0: { cellWidth: 10 }, 1: { cellWidth: 40 }, 2: { cellWidth: 30 }, [headers.length - 1]: { cellWidth: 50 } },
       theme: "grid",
     });
-
     pdf.save("Batch_Report.pdf");
   }
 
-  // Init Report Page
+  // ग्लोबल फंक्शन - इसे DOMContentLoaded के बाहर रखें
+  window.showEligibleLearners = function(course) {
+    const learners = window.eligibleLearners?.[course] || [];
+    const modal = document.getElementById("eligibleModal");
+    const title = document.getElementById("eligibleTitle");
+    const list = document.getElementById("eligibleList");
+
+    if (!modal || !title || !list) return;
+
+    title.innerHTML = `<div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">${course} Eligible Learners (${learners.length})</div>`;
+    list.innerHTML = learners.map((x, index) => `
+      <tr>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
+        <td style="padding:1px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+      </tr>
+    `).join("");
+    modal.style.display = "block";
+  };
+
+  // Init report.html (यह DOMContentLoaded के अंदर का हिस्सा है)
   if (window.location.pathname.includes("report.html")) {
     generateReport();
     const pdfBtn = document.getElementById("downloadPDF");
     if (pdfBtn) pdfBtn.addEventListener("click", downloadPDF);
   }
 
-  // View Button on Home Page
+  // View reports from homepage
   const viewBtn = document.getElementById("viewReportsBtn");
   if (viewBtn) {
     viewBtn.addEventListener("click", () => {
