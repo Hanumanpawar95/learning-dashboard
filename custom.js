@@ -172,7 +172,7 @@ cardColors[course] ||
 
 dashboardHTML += `
 <div
-onclick="showEligibleLearners('${course}')"
+onclick="window.showEligibleLearners('${course}')"
 style="
 cursor:pointer;
 background:${bg};
