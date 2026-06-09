@@ -149,49 +149,70 @@ margin:20px 0;
 ">
 `;
 
+const cardColors = {
+  "BS-CIT":"linear-gradient(135deg,#0f8a3b,#2ecc71)",
+  "BS-CLS":"linear-gradient(135deg,#7b1fa2,#ab47bc)",
+  "BS-CSS":"linear-gradient(135deg,#c2185b,#ff4081)"
+};
+
 courseNames.forEach(course => {
+
+const bg =
+cardColors[course] ||
+"linear-gradient(135deg,#455a64,#78909c)";
 
 dashboardHTML += `
 <div
 onclick="showEligibleLearners('${course}')"
 style="
 cursor:pointer;
-background:white;
-padding:15px;
-min-width:180px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.15);
-border-left:5px solid #28a745;
+background:${bg};
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
 text-align:center;
+transition:.3s;
 ">
 
-<h3>${course}</h3>
+<h3 style="margin:0;">
+${course}
+</h3>
 
 <div style="
-font-size:32px;
+font-size:42px;
 font-weight:bold;
-color:#28a745;
+margin-top:10px;
 ">
 
 ${eligibleCounts[course]}
 
 </div>
 
-<div>Eligible Learners</div>
+<div style="
+font-size:14px;
+opacity:.9;
+">
+
+Eligible Learners
+
+</div>
 
 </div>
 `;
+});
 
 });
 
 dashboardHTML += `
 <div style="
-background:white;
-padding:15px;
-min-width:180px;
-border-radius:10px;
-box-shadow:0 2px 8px rgba(0,0,0,.15);
-border-left:5px solid #2196f3;
+background:linear-gradient(135deg,#1565c0,#42a5f5);
+color:white;
+padding:20px;
+min-width:220px;
+border-radius:12px;
+box-shadow:0 4px 10px rgba(0,0,0,.25);
 text-align:center;
 ">
 
