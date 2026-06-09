@@ -274,34 +274,68 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 });
+window.showEligibleLearners = function(course) {
+  console.log("✅ Clicked course:", course);
 
-window.showEligibleLearners = function(course){
   const learners = window.eligibleLearners?.[course] || [];
-  const modal = document.getElementById("eligibleModal");
-  const title = document.getElementById("eligibleTitle");
-  const list = document.getElementById("eligibleList");
+  console.log("✅ Found learners:", learners.length);
 
+  let modal = document.getElementById("eligibleModal");
+  let title = document.getElementById("eligibleTitle");
+  let list = document.getElementById("eligibleList");
+
+  // 🛑 Bulletproof check: If modal is missing or broken, recreate it dynamically!
   if (!modal || !title || !list) {
-    console.log("Modal elements missing");
-    return;
+    console.warn("⚠️ Modal elements missing, generating dynamically...");
+    
+    // Remove old broken modal if it partially exists
+    if (modal) modal.remove();
+
+    const modalHTML = `
+      <div id="eligibleModal" style="display:block; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999999;">
+        <div style="background:white; width:800px; max-width:95%; max-height:80vh; overflow:auto; margin:50px auto; padding:20px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,.3);">
+          <h2 id="eligibleTitle"></h2>
+          <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+            <thead>
+              <tr style="background:#4CAF50; color:white;">
+                <th style="padding:10px;">🆔 Learner Code</th>
+                <th style="padding:10px;">👤 Learner Name</th>
+              </tr>
+            </thead>
+            <tbody id="eligibleList"></tbody>
+          </table>
+          <div style="text-align:center;">
+            <button onclick="document.getElementById('eligibleModal').style.display='none';" style="background:#f44336; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; margin-top:15px;">✖ Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML("beforeend", modalHTML);
+
+    // Re-grab the newly created elements
+    modal = document.getElementById("eligibleModal");
+    title = document.getElementById("eligibleTitle");
+    list = document.getElementById("eligibleList");
   }
 
+  // Populate Data
   title.innerHTML = `
     <div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">
       ${course} Eligible Learners (${learners.length})
     </div>
   `;
 
-  list.innerHTML = learners.map((x,index) => `
-    <tr>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">
-        ${x.code}
-      </td>
-      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">
-        ${x.name}
-      </td>
-    </tr>
-  `).join("");
+  if (learners.length === 0) {
+    list.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:15px; font-weight:bold; color:red;">No learners found.</td></tr>`;
+  } else {
+    list.innerHTML = learners.map((x, index) => `
+      <tr>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold; text-align:center;">${x.code}</td>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+      </tr>
+    `).join("");
+  }
 
+  // Show the modal explicitly
   modal.style.display = "block";
 };
