@@ -119,6 +119,11 @@ data.forEach(learner => {
   courses.forEach(course => {
 
     const courseData = learner.courses[course];
+	  console.log(
+  learner.name,
+  course,
+  courseData?.eligible
+);
 
     if (
 	  courseData &&
