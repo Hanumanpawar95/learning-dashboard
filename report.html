@@ -141,13 +141,6 @@ text-align:left;
 text-align:center;
 }
 
-.modal-content ul{
-padding-left:20px;
-}
-
-.modal-content li{
-margin-bottom:6px;
-}
 
 </style>
 </head>
@@ -186,14 +179,42 @@ margin-bottom:6px;
 <!-- Eligible Popup -->
 
 <div id="eligibleModal">
-
-<div class="modal-content">
+<div class="modal-content" style="
+background:white;
+width:800px;
+max-width:95%;
+max-height:80vh;
+overflow:auto;
+margin:50px auto;
+padding:20px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+">
 
 <h2 id="eligibleTitle">
 Eligible Learners
 </h2>
 
-<ul id="eligibleList"></ul>
+<table style="
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+">
+
+<thead>
+<tr style="
+background:#4CAF50;
+color:white;
+">
+<th style="padding:8px;">Learner Code</th>
+<th style="padding:8px;">Learner Name</th>
+</tr>
+</thead>
+
+<tbody id="eligibleList">
+</tbody>
+
+</table>
 
 <div style="text-align:center;">
 
@@ -226,45 +247,6 @@ Close
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
 <script src="script.js"></script>
-<div id="eligibleModal" style="
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,.5);
-z-index:99999;
-">
 
-<div style="
-background:white;
-width:600px;
-max-height:80vh;
-overflow:auto;
-margin:50px auto;
-padding:20px;
-border-radius:10px;
-">
-
-<h2 id="eligibleTitle">
-Eligible Learners
-</h2>
-
-<ul id="eligibleList"></ul>
-
-<div style="text-align:center;">
-
-<button onclick="
-document.getElementById('eligibleModal').style.display='none';
-">
-Close
-</button>
-
-</div>
-
-</div>
-
-</div>
 </body>
 </html>
