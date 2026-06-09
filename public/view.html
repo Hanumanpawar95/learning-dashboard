@@ -1,50 +1,196 @@
-<!-- view.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>View Uploaded Reports</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      text-align: center;
-      background-color: #f7f7f7;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Uploaded Reports</title>
 
-    select, button {
-      padding: 10px;
-      margin: 10px;
-      font-size: 16px;
-    }
+<style>
 
-    button {
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+body{
+  font-family: Arial, sans-serif;
+  padding: 30px;
+  background: #f7f7f7;
+  text-align: center;
+}
 
-    button:hover {
-      background-color: #388e3c;
-    }
-  </style>
+h2{
+  color: #333;
+  margin-bottom: 20px;
+}
+
+select,
+button{
+  padding: 10px 15px;
+  font-size: 16px;
+  margin: 10px;
+  border-radius: 6px;
+}
+
+select{
+  min-width: 250px;
+}
+
+button{
+  background: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover{
+  background: #388e3c;
+}
+
+#reportOutput{
+  margin-top: 25px;
+  text-align: left;
+  overflow-x: auto;
+}
+
+#reportOutput table{
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-top: 15px;
+}
+
+#reportOutput th{
+  background: #4caf50;
+  color: white;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+#reportOutput td{
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+</style>
+
 </head>
+
 <body>
-  <h2>🔎 View Uploaded Batch Reports</h2>
 
-  <label for="centerCodeSelect">Select Center Code:</label><br>
-  <select id="centerCodeSelect">
-    <option value="">Loading...</option>
-  </select><br><br>
+<h2>🔎 View Uploaded Batch Reports</h2>
 
-  <label for="batchNameSelect">Select Batch Name:</label><br>
-  <select id="batchNameSelect">
-    <option value="">Please select center first</option>
-  </select><br><br>
+<label>Select Center Code:</label>
+<br>
 
-  <button id="viewReportBtn">📄 View Report</button>
+<select id="viewCenterDropdown">
+  <option value="">Loading...</option>
+</select>
 
-  <script src="script.js"></script>
+<br><br>
+
+<label>Select Batch Name:</label>
+<br>
+
+<select id="viewBatchDropdown">
+  <option value="">Please select center first</option>
+</select>
+
+<br><br>
+
+<button onclick="viewReport()">
+  📄 View Report
+</button>
+
+<hr style="margin:25px 0;">
+
+<div id="reportOutput"></div>
+<!-- Eligible Learners Popup -->
+
+<div id="eligibleModal"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+z-index:99999;
+">
+
+<div
+style="
+background:white;
+width:800px;
+max-width:95%;
+max-height:80vh;
+overflow:auto;
+margin:50px auto;
+padding:20px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+">
+
+<h2 id="eligibleTitle">
+Eligible Learners
+</h2>
+
+<table
+style="
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+">
+
+<thead>
+
+<tr
+style="
+background:#4CAF50;
+color:white;
+">
+
+<th style="padding:10px;">
+🆔 Learner Code
+</th>
+
+<th style="padding:10px;">
+👤 Learner Name
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="eligibleList">
+
+</tbody>
+
+</table>
+
+<div style="text-align:center;">
+
+<button
+onclick="
+document.getElementById('eligibleModal').style.display='none';
+"
+style="
+background:#f44336;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:6px;
+cursor:pointer;
+margin-top:15px;
+">
+
+✖ Close
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+<script src="custom.js"></script>
+
 </body>
 </html>
