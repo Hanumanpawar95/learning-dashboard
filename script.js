@@ -442,29 +442,43 @@ console.log(dashboardHTML);
 
     pdf.save("Batch_Report.pdf");
   }
-window.showEligibleLearners = function(course){
+wwindow.showEligibleLearners = function(course){
 
 const learners =
-window.eligibleLearners[course] || [];
+window.eligibleLearners?.[course] || [];
 
-document.getElementById(
-"eligibleTitle"
-).innerHTML =
+const modal =
+document.getElementById("eligibleModal");
+
+const title =
+document.getElementById("eligibleTitle");
+
+const list =
+document.getElementById("eligibleList");
+
+if (!modal || !title || !list) {
+
+alert(
+course + "\n\n" +
+learners.map(x =>
+`${x.code} - ${x.name}`
+).join("\n")
+);
+
+return;
+}
+
+title.innerHTML =
 course + " Eligible Learners";
 
-document.getElementById(
-"eligibleList"
-).innerHTML =
+list.innerHTML =
 learners.map(x => `
 <li>
-<b>${x.code}</b> -
-${x.name}
+<b>${x.code}</b> - ${x.name}
 </li>
 `).join("");
 
-document.getElementById(
-"eligibleModal"
-).style.display = "block";
+modal.style.display = "block";
 
 };
   // Init report.html
