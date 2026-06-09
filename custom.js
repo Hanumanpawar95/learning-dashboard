@@ -121,10 +121,13 @@ data.forEach(learner => {
     const courseData = learner.courses[course];
 
     if (
-      courseData &&
-      courseData.eligible &&
-      courseData.eligible.includes("✅")
-    ) {
+	  courseData &&
+	  courseData.eligible &&
+	  (
+		courseData.eligible === "✅ Eligible" ||
+		courseData.eligible === "Eligible"
+	  )
+	) {
 
       eligibleCounts[course]++;
 
