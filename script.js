@@ -33,10 +33,25 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("⚠️ No data found in the uploaded CSV.");
             return;
           }
+
+          // --- FIXED: Create a clean, readable Indian Standard Time (IST) timestamp ---
+          const options = {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+          };
+          const istFormatter = new Intl.DateTimeFormat('en-IN', options);
+          const currentISTDateTime = istFormatter.format(new Date());
+
           sessionStorage.setItem("centerCode", centerCode);
           sessionStorage.setItem("batchName", batchName);
           sessionStorage.setItem("uploadedBy", uploadedBy);
-          sessionStorage.setItem("uploadDate", new Date().toLocaleDateString());
+          sessionStorage.setItem("uploadDate", currentISTDateTime); // Saved in clean IST format
           sessionStorage.setItem("reportData", JSON.stringify(data));
           window.location.href = "report.html";
         })
@@ -169,7 +184,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (res.ok) {
           alert("✅ " + data.message + "\n📄 File ID: " + data.fileId);
           sessionStorage.clear();
-          // --- CHANGED: Redirect user back to Home Page for the next action ---
           window.location.href = "index.html"; 
         } else {
           alert("❌ Server error: " + (data.message || "Unknown error"));
