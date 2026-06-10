@@ -80,7 +80,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const courseData = learner.courses[course];
         if (courseData && courseData.eligible && courseData.eligible.includes("✅")) {
           eligibleCounts[course]++;
-          eligibleLearners[course].push({ code: learner.code, name: learner.name });
+          // Updated to pass session count safely down to modal builder
+          eligibleLearners[course].push({ 
+            code: learner.code, 
+            name: learner.name, 
+            sessions: courseData.sessionCount || 0 
+          });
           anyEligible = true;
         }
       });
@@ -224,10 +229,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const list = document.getElementById("eligibleList");
     if (!modal || !title || !list) return;
     title.innerHTML = `<div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">${course} Eligible Learners (${learners.length})</div>`;
+    
+    // Updated template parsing to include third sessions column
     list.innerHTML = learners.map((x, index) => `
       <tr>
         <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
-        <td style="padding:1px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+        <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:center;">Completed Session : ${x.sessions}</td>
       </tr>
     `).join("");
     modal.style.display = "block";
