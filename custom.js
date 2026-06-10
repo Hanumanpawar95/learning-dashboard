@@ -5,13 +5,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!centerDropdown || !batchDropdown || !reportOutput) return;
 
-  // --- ADDED: Ensure Eligible Modal exists in DOM ---
+  // --- Ensure Eligible Modal exists in DOM with the new column header ---
   const eligibleModalHTML = `
     <div id="eligibleModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
       <div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-height: 80vh; overflow-y: auto; position: relative;">
         <div id="eligibleTitle"></div>
         <table style="width: 100%; border-collapse: collapse;">
-          <thead><tr style="background: #eee;"><th style="padding:10px; border:1px solid #ddd;">Learner Code</th><th style="padding:10px; border:1px solid #ddd;">Learner Name</th></tr></thead>
+          <thead>
+            <tr style="background: #eee;">
+              <th style="padding:10px; border:1px solid #ddd;">Learner Code</th>
+              <th style="padding:10px; border:1px solid #ddd;">Learner Name</th>
+              <th style="padding:10px; border:1px solid #ddd;">Sessions</th>
+            </tr>
+          </thead>
           <tbody id="eligibleList"></tbody>
         </table>
         <button onclick="document.getElementById('eligibleModal').style.display='none'" style="margin-top:20px; width:100%; padding:10px; background:#f44336; color:white; border:none; cursor:pointer;">Close</button>
@@ -19,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
   `;
   document.body.insertAdjacentHTML("beforeend", eligibleModalHTML);
-  // ----------------------------------------------------
 
   // Step 1: Load metadata
   fetch("https://learning-dashboard-zlb0.onrender.com/get-reports-metadata")
@@ -90,19 +95,26 @@ document.addEventListener("DOMContentLoaded", () => {
           const eligibleLearners = {};
           courses.forEach(course => { eligibleCounts[course] = 0; eligibleLearners[course] = []; });
           let totalEligible = 0;
+          
           data.forEach(learner => {
             let anyEligible = false;
             courses.forEach(course => {
               const courseData = learner.courses[course];
               if (courseData?.eligible === "✅ Eligible" || courseData?.eligible === "Eligible") {
                 eligibleCounts[course]++;
-                eligibleLearners[course].push({ code: learner.code, name: learner.name });
+                // Added sessionCount field data down into collection array
+                eligibleLearners[course].push({ 
+                  code: learner.code, 
+                  name: learner.name, 
+                  sessions: courseData.sessionCount || 0 
+                });
                 anyEligible = true;
               }
             });
             if (anyEligible) totalEligible++;
           });
           window.eligibleLearners = eligibleLearners;
+          
           let dashboardHTML = `<div style="display:flex; gap:15px; flex-wrap:wrap; justify-content:center; margin:20px 0;">`;
           const cardColors = { "BS-CIT": "linear-gradient(135deg,#0f8a3b,#2ecc71)", "BS-CLS": "linear-gradient(135deg,#7b1fa2,#ab47bc)", "BS-CSS": "linear-gradient(135deg,#c2185b,#ff4081)" };
           courses.forEach(course => {
@@ -120,7 +132,16 @@ document.addEventListener("DOMContentLoaded", () => {
               <div style="font-size:42px; font-weight:bold; margin-top:10px;">${totalEligible}</div>
               <div style="font-size:14px; opacity:.9;">Eligible In Any Course</div>
             </div></div>`;
-          const reportHeader = `<div style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border: 1px solid #ccc;"><strong>Batch Name:</strong> ${report.batchName || batch}<br><strong>Center Code:</strong> ${report.centerCode || center}</div>`;
+          
+          // Updated to show Uploaded By and Date metadata info fields
+          const reportHeader = `
+            <div style="margin-bottom: 20px; padding: 15px; background: #f5f5f5; border: 1px solid #ccc; text-align: left; border-radius: 8px; line-height: 1.6;">
+              <strong>Batch Name:</strong> ${report.batchName || batch}<br>
+              <strong>Center Code:</strong> ${report.centerCode || center}<br>
+              <strong>Uploaded By:</strong> ${report.uploadedBy || "-"}<br>
+              <strong>Date:</strong> ${report.uploadDate || "-"}
+            </div>`;
+            
           const table = document.createElement("table");
           table.border = "1"; table.cellPadding = "8"; table.style.width = "100%"; table.style.borderCollapse = "collapse";
           const headerRow = document.createElement("tr");
@@ -149,10 +170,13 @@ window.showEligibleLearners = function(course) {
   const list = document.getElementById("eligibleList");
   if (!modal || !title || !list) { console.log("Modal elements missing"); return; }
   title.innerHTML = `<div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">${course} Eligible Learners (${learners.length})</div>`;
+  
+  // Render structure now tracking code, name, and specific course dynamically computed counts
   list.innerHTML = learners.map((x, index) => `
     <tr>
       <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
       <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:left;">${x.name}</td>
+      <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; text-align:center;">Completed Session : ${x.sessions}</td>
     </tr>
   `).join("");
   modal.style.display = "block";
