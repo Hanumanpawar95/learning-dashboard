@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const courseData = learner.courses[course];
         if (courseData && courseData.eligible && courseData.eligible.includes("✅")) {
           eligibleCounts[course]++;
-          // Updated to pass session count safely down to modal builder
           eligibleLearners[course].push({ 
             code: learner.code, 
             name: learner.name, 
@@ -170,11 +169,16 @@ document.addEventListener("DOMContentLoaded", function () {
         if (res.ok) {
           alert("✅ " + data.message + "\n📄 File ID: " + data.fileId);
           sessionStorage.clear();
+          // --- CHANGED: Redirect user back to Home Page for the next action ---
+          window.location.href = "index.html"; 
         } else {
           alert("❌ Server error: " + (data.message || "Unknown error"));
         }
       })
-      .catch((err) => { console.error("❌ Error saving report:", err); alert("❌ Failed to save report."); });
+      .catch((err) => { 
+        console.error("❌ Error saving report:", err); 
+        alert("❌ Failed to save report."); 
+      });
   }
 
   function downloadPDF() {
@@ -230,7 +234,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!modal || !title || !list) return;
     title.innerHTML = `<div style="background:linear-gradient(135deg,#4CAF50,#2E7D32); color:white; padding:15px; border-radius:10px; text-align:center; font-size:22px; font-weight:bold; margin-bottom:10px;">${course} Eligible Learners (${learners.length})</div>`;
     
-    // Updated template parsing to include third sessions column
     list.innerHTML = learners.map((x, index) => `
       <tr>
         <td style="padding:10px; border:1px solid #ddd; background:${index % 2 ? '#f8f9fa' : '#ffffff'}; font-weight:bold;">${x.code}</td>
